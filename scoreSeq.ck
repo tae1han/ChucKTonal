@@ -528,54 +528,7 @@ spork ~ camTranslate(moveCamL);
 spork ~ camTranslate(moveCamU);
 spork ~ camTranslate(moveCamD);
 //-----------------------------------------------------------------------------
-// HID
 
-// which keyboard
-//0 => int device;
-
-// HID input and HID message
-//Hid hi;
-//HidMsg msg;
-
-// get KEYBOARD from command line
-//if( me.args() ) me.arg(0) => Std.atoi => device;
-// open keyboard (get device number from command line)
-//if( !hi.openKeyboard( device ) ) me.exit();
-//<<< "keyboard '" + hi.name() + "' ready", "" >>>;
-
-//fun void KB_listen()
-//{
-//    // infinite event loop
-//    while( true )
-//    {
-//        // wait for event
-//        hi => now;
-//
-//        // get message
-//        while( hi.recv( msg ) )
-//        {
-//            // check
-//            if( msg.isButtonDown() )
-//            {
-//                if(msg.which == 46) // key C
-//                {
-//                    <<<"switching camera view">>>;
-//                    camMode++;
-//                    2 %=> camMode;
-//                    GG.camera().pos(camViews[camMode]);
-//                    GG.camera().lookAt(@(0, -1, 0));
-//                }
-//
-//                if(msg.which == 30) // key A
-//                {
-//                    GG.camera().pos() => vec3 currentPos;
-//                    <<<currentPos>>>;
-//                }
-//            }
-//        }
-//    }
-//}
-//spork~KB_listen();
 //---------------------------------------------------------------------
 // Melody Ring Custom GGen
 //---------------------------------------------------------------------
