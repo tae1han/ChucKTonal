@@ -1,3 +1,24 @@
+// ------------------------------------------------------------------
+// Chord parser
+// ------------------------------------------------------------------
+// Enter chords as string, get MIDI note numbers out!
+// Basically this whole thing gives you one nice function parseChord
+// input: a string, following conventional chord nomenclature
+// Ex:
+// input (string): "Gbmaj7#11" = "G" + "b" + "maj" + "7#11"
+// output (int[]): [6, 10, 13, 17, 20, 24]
+// this corresponds to notes Gb Bb Db F Ab C (octave 0)
+//
+// usage notes:
+// input expects the format: pitch + accidental + triad + extension
+// pitch is always 1 character, accidental is 0-2 characters, triad is 0 or 3 characters, extension is arbitrarily long
+// some extensions assume the presence of unspecified extensions--in example above, Gbmaj7#11 assumes that the 9th (Ab) is also present
+//
+// See bottom for various test cases
+// 
+// Alex Han 2023
+
+
 int pitch_dict[7];
 0 => pitch_dict["C"];
 2 => pitch_dict["D"];
@@ -255,7 +276,8 @@ fun void testParse(string input)
 
 
 /////////////////////////////////////////////////////////////////////////////
-// testing
+// Test cases
+
 string testStrings[0];
 testStrings << "A";
 testStrings << "Bmin";
@@ -266,9 +288,6 @@ testStrings << "Gbaug7#9";
 testStrings << "Abmaj9#11";
 testStrings << "B7b9#9b13";
 
-// "Gbmaj7#11" = "G" + "b" + "maj" + "7#11"
-// pitch + accidental + triad + extension
-// pitch is always 1 character, accidental is 0-2 characters, triad is 0 or 3 characters, extension is arbitrarily long
 Rhodey r => JCRev rev => dac;
 .5 => r.gain;
 .15 => rev.mix;
