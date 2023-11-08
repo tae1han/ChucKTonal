@@ -1,21 +1,18 @@
+///////////////////////////////////////////////////////////////////////
+// scoreSequencer - demo for EZ score usage 
+///////////////////////////////////////////////////////////////////////
+// This is a demonstration of EZ score combined with a graphical sequencer
+// made in ChuGL. It shows how melodies can be combined "vertically" to play
+// concurrently, as well as sequenced "horizontally" in time. Melodies are visualized
+// as "Rings" which can be stacked or placed in a grid. Custom GGens for Rings, 
+// RingStack, and RingGrid may be repurposed for score arrangement more generally.
+// 
+//
+// Alex Han 2023
+
 //---------------------------------------------------------------------
-// Testing playback
+// Helper functions
 //---------------------------------------------------------------------
-
-140 => float bpm;
-(60 / bpm)::second => dur T;
-T - (now % T) => now;
-Gain master => dac;
-master.gain(.25);
-
-
-
-
-//---------------------------------------------------------------------
-// score4-style notation input
-//---------------------------------------------------------------------
-// helper functions
-
 fun string clean_input(string input)
 {
 	input.replace("//", " ");
@@ -75,10 +72,9 @@ fun string[] split_delim(string input, string delim)
 
     return out;
 }
-
+//---------------------------------------------------------------------
 /// RHYTHM PARSING
-
-
+//---------------------------------------------------------------------
 ["s", "e", "q", "h", "w"] @=> string durationLabels[];
 [.25, .5, 1.0, 2.0, 4.0] @=> float durationVals[];
 float durationMap[5];
@@ -173,9 +169,9 @@ fun float[] parse_rhythm(string raw)
     }
     return output;
 }
-
+//---------------------------------------------------------------------
 /// PITCH PARSING
-
+//---------------------------------------------------------------------
 ["c", "d", "e", "f", "g", "a", "b", "r"] @=> string base_pitches[];
 [12, 14, 16, 17, 19, 21, 23, -999] @=> int base_notes[];
 int pitch_map[7];
@@ -184,7 +180,6 @@ for (int i; i < base_pitches.size(); i++)
 {
     base_notes[i] => pitch_map[base_pitches[i]];
 }
-
 
 fun int[] getKeyVector(string key)
 {
@@ -330,6 +325,9 @@ fun int[] parse_pitch(string input)
     return output;
 }
 
+//---------------------------------------------------------------------
+// Melody Class
+//---------------------------------------------------------------------
 
 class Melody
 {
@@ -432,6 +430,15 @@ class Melody
 }
 
 
+//---------------------------------------------------------------------
+// Global playback 
+//---------------------------------------------------------------------
+
+140 => float bpm;
+(60 / bpm)::second => dur T;
+T - (now % T) => now;
+Gain master => dac;
+master.gain(.25);
 
 
 //-----------------------------------------------------------------------------
@@ -836,7 +843,7 @@ class RingGrid extends GGen
         rows => _rows;
         cols => _cols;
         rows => gridSize[0];
-        cols => grisSize[1];
+        cols => gridSize[1];
         RingStack temp[_rows*_cols] @=> cells;
     }
 
@@ -875,29 +882,8 @@ class RingGrid extends GGen
 }
 
 //---------------------------------------------------------------------
-// Testing MIDI parse
+// Testing
 //---------------------------------------------------------------------
-
-"[ef4 efu d bf c d ef efd cu bf]" => string rainbow;
-//"k2s[roll/f4:a:du/ r g5 f e f a g f g a r a b c d a f a g f g a g es f]" => string mozart_p;
-//[roll/fs4:a:du/ r g5 fs e fs a g fs g a r a b cs d a fs a g fs g a g es fs]" => string mozart_p;
-"[d5 r g fs e fs a g fs g a r a b cs d a fs a g fs g a g fs d]" => string mozart_p;
-"[c5 e g bd cu d c a g cu gd f e f e]" => string mozart_p2;
-"[h q q q. sx2 h h qx4 te te te q]" => string mozart_r2;
-"[q q sx8 q q e e e e q q sx4 e e e q.]" => string mozart_r;
-"[a5 r cu r ad bf gf ef bfu af f df afd gfu dn r fs e d cs e d d bfd g a f ef r du cs d f ef bd af dfu bfd r bf a af g bn a f e d f f d g r r]" => string coltrane_p;
-"[a5 r c r a bf gf ef bfu af f df af gfu dn r fs e d cs e d d bf g a f ef r du cs d f ef b af df bf r bf a af g bn a f e d f f d g r r]" => string coltrane2_p;
-"[ex25 q e q. q ex8 q ex6 ex7 q. h e]" => string coltrane_r;
-"[k2f//f4//b du c bd eu df dn f//r e f e//r d e d c ad b du//c gd b a r b//g b du bd r//enu ef gfd b cu d//f bnd r afu r gf//gn e bd g du f]" => string anthropology_p1;
-"[k2f//f4//b d c b e df dn f//r e f e//r d e d c a b d//c g b a r b//g b d b r//enu ef gfd b c d//f bnd r afu r gf//gn e b g du f]" => string anthropology_p2;
-"[e//ex8//q. q e q//e ex7//ex4 q. q.//ex5//q q q e e e//q. e ex4//ex4 e q]" => string anthropology_r1;
-"[ef5 d bfd]" => string layer1_p;
-"[q q q]" => string layer1_r;
-"[c4 d ef g]" => string layer2_p;
-"[e e e e]" => string layer2_r;
-"[af2 efu bf af g]" => string layer3_p;
-"[q q q q q]" => string layer3_r;
-
 
 // define three simple melodies
 ["[ef5 d bfd]", "[c4 d ef g]", "[af2 efu bf af g]"] @=> string threePart_p[];
@@ -943,25 +929,7 @@ for(int i; i < 4; i++)
     grid.playSequence([12, 12]);
 }
 
-
-
 while(true)
 {
     1::second => now;
 }
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////
-// TO-DO:
-// tied notes
-// better debugging tools or ways to ensure valid line-up between pitch and rhythm
-// measure flags -> force alignment?
-
-// chords
-// velocity stream
-// sequence melodies
-// concurrent melodies
-
-// EZscore on-screen type in 
