@@ -383,9 +383,14 @@ public class EZscore
         sum => totalDuration;
     }
 
-    fun int getLength()
+    fun int countNotes()
     {
-        return length;
+        int count;
+        for(int i; i < length; i++)
+        {
+            pitches[i].size() +=> count;
+        }
+        return count;
     }
 
     fun float getTotalDur()
@@ -499,9 +504,9 @@ EZscore melody;
 
 melody.setPitch(mozart_p);
 melody.setRhythm(mozart_r);
-melody.printBoth();
+//melody.printBoth();
 melody.n_voices => int N;
-<<<"max voices: ", N>>>;
+//<<<"max voices: ", N>>>;
 
 //---------------------------------------------------------------------
 // Testing playback
@@ -542,12 +547,12 @@ fun void playStreams(int notes[][], float durations[])
     }
 }
 
-playStreams(melody.pitches, melody.durations);
+//playStreams(melody.pitches, melody.durations);
 
-while(true)
-{
-    1::second => now;
-}
+//while(true)
+//{
+//    1::second => now;
+//}
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // TO-DO:

@@ -467,7 +467,7 @@ class RingGrid extends GGen
 
 // define three simple melodies
 ["[ef5 d bfd]", "[c4 d ef g]", "[af2 efu bf af g]"] @=> string threePart_p[];
-["[q q q]", "[e e e e]", "[q q q q q]"] @=> string threePart_r[];
+["[q q. q]", "[e e e e]", "[q q e e q]"] @=> string threePart_r[];
 
 EZscore threeMelodies[3];
 for(int i; i < threeMelodies.size(); i++)
@@ -478,7 +478,7 @@ for(int i; i < threeMelodies.size(); i++)
 
 // define three more simple melodies
 ["[bf5 bfu]", "[g3 cu d f]", "[af3 bf ef]"] @=> string threePart2_p[];
-["[q. q.]", "[q. q. q. q.]", "[h h h]"] @=> string threePart2_r[];
+["[q. q.]", "[q. q q. q]", "[h q h]"] @=> string threePart2_r[];
 EZscore threeMelodies2[3];
 for(int i; i < threeMelodies2.size(); i++)
 {

@@ -466,7 +466,7 @@ EZscore melody;
 
 melody.setPitch(anthropology_p1);
 melody.setRhythm(anthropology_r1);
-melody.printBoth();
+//melody.printBoth();
 
 //---------------------------------------------------------------------
 // Testing playback
@@ -500,7 +500,7 @@ fun void playStreams(int notes[], float durations[])
     }
 }
 
-spork~playStreams(melody.pitches, melody.durations);
+//spork~playStreams(melody.pitches, melody.durations);
 
 while(true)
 {

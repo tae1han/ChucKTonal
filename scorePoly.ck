@@ -18,7 +18,7 @@
 (60 / bpm)::second => dur T;
 T - (now % T) => now;
 Gain master => dac;
-master.gain(.25);
+master.gain(.5);
 
 //---------------------------------------------------------------------
 // ChuGL
@@ -26,7 +26,6 @@ master.gain(.25);
 // set up scene
 GG.scene().backgroundColor( @(1,1,1) );
 GScene scene;
-
 
 // Camera settings
 
@@ -131,12 +130,14 @@ class Ring extends GGen
     0 => float offset;
     2.5 => float radius;
     1.5 => float max_height;
-    vec3 positions[];
+    vec3 positions[0][0];
+    int _nLines;
 
     // melody variables
     int _size;
+    int _notes;
     float durations[];
-    int pitches[];
+    int pitches[][];
     float lowP;
     float hiP;
     float dy;
@@ -144,38 +145,44 @@ class Ring extends GGen
 
     // music
     bpm => float local_bpm;
-    SinOsc this_osc;
-    ADSR this_env;
+    int n_voices;
+    //SinOsc this_osc;
+    SinOsc oscs[];
+    //ADSR this_env;
+    ADSR envs[];
+    Gain bus;
     int playing;
     float totalDuration;
     // follower
     Step step[0]; ADSR height_followers[0];
 
-    fun void pre_init(float r, float h, vec3 origin)
+    fun void init_pos(float r, float h, vec3 origin)
     {
-
         r => radius;
         h => max_height;
         ringParent.pos(origin);
-
     }
     fun void init(EZscore input_melody)
     {
         // get data from Melody object
         input_melody @=> m;
-        m.getRhythm() @=> durations;
-        m.getPitches() @=> pitches;
-        m.getLength() => _size;
-        m.getTotalDur()=> totalDuration;
+        m.durations @=> durations;
+        m.pitches @=> pitches;
+        m.length => _size;
+        m.countNotes() => _notes;
+        m.n_voices => n_voices;
+        m.totalDuration => totalDuration;
+        2*_notes - _size => _nLines;
         init_spheres();
         init_lines();
+        init_sound();
         init_followers();
 
     }
 
     fun void init_spheres()
     {
-        GSphere temp[_size] @=> spheres;
+        GSphere temp[_notes] @=> spheres;
         // set up sphere objects
         for(auto x : spheres)
         {
@@ -193,54 +200,80 @@ class Ring extends GGen
         m.getHighestNote() => hiP;
         max_height / (hiP - lowP) => dy;
 
-        // set sphere positions
-        for (int i; i < durations.size(); i++)
+        0 => int sphereIndex;
+        for (int i; i < pitches.size(); i++)
         {
+            vec3 chordPositions[0];
+            pitches[i] @=> int curr_notes[];
             durations[i] * dTheta +=> offset;
             radius * Math.cos(offset) => float xPos;
             radius * Math.sin(offset) => float zPos;
-            (pitches[i] - lowP) * dy => float yPos;
-            spheres[i].pos(@(xPos, yPos, zPos));
-        }
-
-        vec3 t[_size] @=> positions;
-        for (auto s : spheres)
-        {
-            positions << s.pos();
+            for (int j; j < curr_notes.size(); j++)
+            {
+                (curr_notes[j] - lowP) * dy => float yPos;
+                if (yPos <= 0) 0 => yPos;
+                spheres[sphereIndex].pos(@(xPos, yPos, zPos));
+                chordPositions << @(xPos, yPos, zPos);
+                sphereIndex++;
+            }
+            positions << chordPositions;
         }
     }
 
     fun void init_lines()
     {
-        GLines temp[_size] @=> lines;
+        GLines temp[_nLines] @=> lines;
+        0 => int lineIndex;
+        0 => int sphereIndex;
         // set up lines
         for (auto l : lines)
         {
             l.mat().color(@(0, 0, 0));
             l --> ringParent;
         }
-
-        for (int i; i < _size; i++)
+        for(int i; i < _size; i++) // each X-Z position along ring
         {
-            vec3 endpoints[2];
-            spheres[i].pos() => endpoints[0];
-            spheres[(i + 1) % _size].pos() => endpoints[1];
-            endpoints => lines[i].geo().positions;
+            pitches[i].size() => int thisChordSize;
+            pitches[(i + 1)%_size].size() => int nextChordSize;
+            // connect each sphere at this (vertical) position to the bottom sphere of the next position
+            for (int p; p < thisChordSize; p++)
+            {
+                vec3 endpoints[2];
+                spheres[(sphereIndex + p) % _notes].pos() => endpoints[0];
+                spheres[(sphereIndex + thisChordSize) % _notes].pos() => endpoints[1];
+                endpoints => lines[lineIndex].geo().positions;
+                (lineIndex + 1) % _nLines => lineIndex;
+            }
+            // connect the bottom sphere at this position to each sphere in the next position
+            for (1 => int q; q < nextChordSize; q++)
+            {
+                vec3 endpoints[2];
+                spheres[sphereIndex].pos() => endpoints[0];
+                spheres[(sphereIndex + thisChordSize + q) % _notes].pos() => endpoints[1];
+                endpoints => lines[lineIndex].geo().positions;
+                (lineIndex + 1) % _nLines => lineIndex;
+            }
+            sphereIndex + thisChordSize => sphereIndex;
         }
     }
 
-    fun void init_sound(SinOsc theOsc, ADSR theEnv, float b)
+    fun void init_sound()
     {
-        b => local_bpm;
-        theOsc @=> this_osc;
-        theEnv @=> this_env;
+        SinOsc tempOsc[n_voices] @=> oscs;
+        ADSR tempEnv[n_voices] @=> envs; 
+        bus.gain(.1);
+        for(int i; i < n_voices; i++)
+        {
+            oscs[i] => envs[i] => bus => master;
+            envs[i].set(10::ms, 500::ms, 0.0, 50::ms);
+        }
     }
 
     fun void init_followers()
     {
-        Step temp[_size] @=> step;
-        ADSR temp2[_size] @=> height_followers;
-        for(int i; i < _size; i++)
+        Step temp[_notes] @=> step;
+        ADSR temp2[_notes] @=> height_followers;
+        for(int i; i < _notes; i++)
         {
             height_followers[i].set(20::ms, 400::ms, 0.0, 200::ms);
             //height_followers[i].target((pitches[i] - lowP) * dy);
@@ -250,17 +283,26 @@ class Ring extends GGen
 
     fun void playMelody()
     {
+        0 => int index;
         //need to also check that the note and duration streams are the same length
-        for(int i; i < durations.size(); i++)
+        for(int i; i < _size; i++)
         {
-            pitches[i] => int note;
+            pitches[i] @=> int curr_notes[];
             60*durations[i]/local_bpm => float durTime;
-            if(note >= 0)
+            for(int j; j < curr_notes.size(); j++)
             {
-                this_osc.gain(1.0);
-                Std.mtof(note) => this_osc.freq;
-                this_env.keyOn();
-                height_followers[i].keyOn();
+                curr_notes[j] => int note;
+                if(note >= 0)
+                {
+                    //this_osc.gain(1.0);
+                    oscs[j].gain(.2);
+                    //Std.mtof(note) => this_osc.freq;
+                    Std.mtof(note) => oscs[j].freq;
+                    //this_env.keyOn();
+                    envs[j].keyOn();
+                    height_followers[index].keyOn();
+                }
+                index++;
             }
             durTime::second => now;
         }
@@ -288,22 +330,49 @@ class Ring extends GGen
 
     fun void update()
     {
+        0 => int sphereIndex;
+        0 => int lineIndex;
+        0 => int lowestSphere;
         GG.dt() => float dt;  // get delta time
         ringParent.rotateY(-.2 * dt);
-        for(int i; i < _size; i++)
-        {
-            // update sphere positions
-            ((pitches[i] - lowP) * dy) => float yNew;
-            if (yNew <= 0) 0 => yNew;
-            height_followers[i].last() => float env;
-            spheres[i].posY(yNew/2 + (yNew * env*1.25)/2);
-            spheres[i].sca(@(.05 + env/10, .05 + env/10, .05 + env/10));
 
-            // update line positions
-            vec3 endpoints[2];
-            spheres[i].pos() => endpoints[0];
-            spheres[(i + 1) % _size].pos() => endpoints[1];
-            endpoints => lines[i].geo().positions;
+        for(int i; i < _size; i++) // each X-Z position along ring
+        {
+            pitches[i] @=> int curr_notes[];
+            pitches[i].size() => int thisChordSize;
+            pitches[(i + 1)%_size].size() => int nextChordSize;
+
+            // update sphere positions
+            for (int j; j < curr_notes.size(); j++)
+            {
+                
+                ((curr_notes[j] - lowP) * dy) => float yNew;
+                if (yNew <= 0) 0 => yNew;
+                height_followers[sphereIndex].last() => float env;
+                spheres[sphereIndex].posY(yNew/2 + (yNew * env*1.25)/2);
+                spheres[sphereIndex].sca(@(.05 + env/10, .05 + env/10, .05 + env/10));
+                (sphereIndex + 1) % _notes => sphereIndex;
+            }
+
+            // connect each sphere at this (vertical) position to the bottom sphere of the next position
+            for (int p; p < thisChordSize; p++)
+            {
+                vec3 endpoints[2];
+                spheres[(lowestSphere + p) % _notes].pos() => endpoints[0];
+                spheres[(lowestSphere + thisChordSize) % _notes].pos() => endpoints[1];
+                endpoints => lines[lineIndex].geo().positions;
+                (lineIndex + 1) % _nLines => lineIndex;
+            }
+            // connect the bottom sphere at this position to each sphere in the next position
+            for (1 => int q; q < nextChordSize; q++)
+            {
+                vec3 endpoints[2];
+                spheres[lowestSphere].pos() => endpoints[0];
+                spheres[(lowestSphere + thisChordSize + q) % _notes].pos() => endpoints[1];
+                endpoints => lines[lineIndex].geo().positions;
+                (lineIndex + 1) % _nLines => lineIndex;
+            }
+            lowestSphere + thisChordSize => lowestSphere;
         }
     }
 
@@ -317,197 +386,21 @@ class Ring extends GGen
     }
 }
 
-class RingStack extends GGen
-{
-
-    Ring rings[];
-    EZscore melodies[];
-    int _size;
-    GGen stackParent;
-    stackParent --> scene;
-
-    2 => float max_displacement;
-    2.5 => float max_radius;
-    2 => float max_height;
-
-    SinOsc theseOsc[];
-    ADSR theseEnv[];
-    Gain stackBus;
-
-    0 => float maxDuration;
-
-    fun void init(EZscore m[])
-    {
-        m.size() => _size;
-        m @=> melodies;
-        Ring temp[_size] @=> rings;
-        SinOsc tempOsc[_size] @=> theseOsc;
-        ADSR tempEnv[_size] @=> theseEnv;
-        init_rings();
-        init_sound();
-    }
-
-    fun void init_rings()
-    {
-        (max_radius - 1) / (_size - 1) => float radius_spread;
-        max_displacement/_size => float d;
-        max_height / (_size - 1) => float height_spread;
-        for(int i; i < _size; i++)
-        {
-            1 + (radius_spread*i) => float r;
-            max_height/2 - (height_spread*i) => float y;
-            rings[i].pre_init(r, d, @(0, y, 0));
-            rings[i].init(melodies[i]);
-            rings[i].init_sound(theseOsc[i], theseEnv[i], bpm);
-            60*(rings[i].totalDuration)/rings[i].local_bpm => float thisDuration;
-            if(thisDuration > maxDuration)
-            {
-                thisDuration => maxDuration;
-            }
-            rings[i].ringParent --< scene;
-            rings[i].ringParent --> stackParent;
-        }
-    }
-
-    fun void init_sound()
-    {
-        for(int i; i < _size; i++)
-        {
-            theseOsc[i] => theseEnv[i] => stackBus => master;
-            theseOsc[i].gain(1/_size);
-            theseEnv[i].set(10::ms, 500::ms, 0.0, 50::ms);
-            stackBus.gain(.2);
-        }
-    }
-
-    fun void reposition(vec3 location)
-    {
-        stackParent.pos(location);
-    }
-
-    fun void loopPlay()
-    {
-        for(auto r : rings)
-        {
-            spork~r.playScene();
-            spork~r.loopMelody();
-        }
-    }
-
-    fun void play(int beats)
-    {
-        for(auto r : rings)
-        {
-            spork~r.playScene();
-            (60*(r.totalDuration)/r.local_bpm)::second => dur waitTime;
-            beats*(T/waitTime) => float N;
-            spork~r.repeatMelody(Math.ceil(N)$int);
-        }
-
-        beats*T => now;
-    }
-}
-
-class RingGrid extends GGen
-{
-
-    RingStack cells[];
-    int _rows;
-    int _cols;
-    this --> scene;
-
-    int repeatSequence[];
-
-    fun void init(int rows, int cols)
-    {
-        rows => _rows;
-        cols => _cols;
-        rows => gridSize[0];
-        cols => gridSize[1];
-        RingStack temp[_rows*_cols] @=> cells;
-    }
-
-    fun void setCell(RingStack stack, int r, int c)
-    {
-        r*_cols + c => int index;
-        stack.stackParent --< scene;
-        stack.stackParent --> this;
-        stack.reposition(@(c*5, 0, r*5));
-        stack @=> cells[index];
-    }
-
-    fun void setRepeats(int repeats[])
-    {
-        repeats @=> repeatSequence;
-    }
-
-    fun void playSequence()
-    {
-        for(auto s : cells)
-        {
-            s.play(12);
-        }
-    }
-    fun void playSequence(int repeatSeq[])
-    {
-        while(repeatSeq.size() < cells.size())
-        {
-            repeatSeq << 0;
-        }
-        for(int i; i < cells.size(); i++)
-        {
-            cells[i].play(repeatSeq[i]);
-        }
-    }
-}
 
 //---------------------------------------------------------------------
 // Testing
 //---------------------------------------------------------------------
+"[k2s f4:a:du r g fs e fs a g fs g a r a b csd d au fs a g fs g a g fs d r]" => string mozart_p;
+"[q q sx8 q q e e e e q q sx4 e e e q. h]" => string mozart_r;
 
-// define three simple melodies
-["[ef5 d bfd]", "[c4 d ef g]", "[af2 efu bf af g]"] @=> string threePart_p[];
-["[q q q]", "[e e e e]", "[q q q q q]"] @=> string threePart_r[];
+EZscore melody;
+melody.setPitch(mozart_p);
+melody.setRhythm(mozart_r);
 
-EZscore threeMelodies[3];
-for(int i; i < threeMelodies.size(); i++)
-{
-    threeMelodies[i].setPitch(threePart_p[i]);
-    threeMelodies[i].setRhythm(threePart_r[i]);
-}
-
-// define three more simple melodies
-["[bf5 bfu]", "[g3 cu d f]", "[af3 bf ef]"] @=> string threePart2_p[];
-["[q. q.]", "[q. q. q. q.]", "[h h h]"] @=> string threePart2_r[];
-EZscore threeMelodies2[3];
-for(int i; i < threeMelodies2.size(); i++)
-{
-    threeMelodies2[i].setPitch(threePart2_p[i]);
-    threeMelodies2[i].setRhythm(threePart2_r[i]);
-}
-
-// instantiate a ring stack of first 3 melodies
-RingStack stack;
-stack.init(threeMelodies);
-//stack.loopPlay();
-
-// instantiate a ring stack of ssecond 3 melodies
-RingStack stack2;
-stack2.init(threeMelodies2);
-//stack2.loopPlay();
-
-// instantiate parent grid, place ring stacks in grid
-RingGrid grid;
-grid.init(2, 2);
-grid.setCell(stack, 0, 0);
-grid.setCell(stack2, 0, 1);
-
-
-// play through the grid sequentially
-for(int i; i < 4; i++)
-{
-    grid.playSequence([12, 12]);
-}
+Ring ring;
+ring.init(melody);
+spork ~ ring.loopMelody();
+spork ~ ring.playScene();
 
 while(true)
 {
