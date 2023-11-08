@@ -468,6 +468,45 @@ melody.setPitch(anthropology_p1);
 melody.setRhythm(anthropology_r1);
 melody.printBoth();
 
+//---------------------------------------------------------------------
+// Testing playback
+//---------------------------------------------------------------------
+
+240 => float bpm;
+// t = 60*n/bpm sec
+SinOsc osc => ADSR adsr => Gain g => dac;
+
+adsr.set(10::ms, 500::ms, 0.0, 50::ms);
+g.gain(.2);
+
+fun void play(int note, float duration)
+{
+    60*duration/bpm => float durTime;
+    if(note >= 0)
+    {
+        osc.gain(1.0);
+        Std.mtof(note) => osc.freq;
+        adsr.keyOn();
+    }
+    durTime::second => now;
+}
+
+fun void playStreams(int notes[], float durations[])
+{
+    //need to also check that the note and duration streams are the same length
+    for(int i; i < notes.size(); i++)
+    {
+        play(notes[i], durations[i]);
+    }
+}
+
+spork~playStreams(melody.pitches, melody.durations);
+
+while(true)
+{
+    1::second => now;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////
 // TO-DO:
 // tied notes
@@ -476,7 +515,5 @@ melody.printBoth();
 
 // chords
 // velocity stream
-// sequence melodies
-// concurrent melodies
 
-// EZscore on-screen type in 
+// on-screen type in 
