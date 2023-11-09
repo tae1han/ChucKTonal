@@ -491,7 +491,7 @@ RingStack stack;
 stack.init(threeMelodies);
 //stack.loopPlay();
 
-// instantiate a ring stack of ssecond 3 melodies
+// instantiate a ring stack of second 3 melodies
 RingStack stack2;
 stack2.init(threeMelodies2);
 //stack2.loopPlay();

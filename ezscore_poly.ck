@@ -26,12 +26,12 @@ public class EZscore
     fun string clean_input(string input)
     {
         input.replace("//", " ");
-        <<<input>>>;
+        //<<<input>>>;
         input.find("[") => int braceL;
         input.substring(0, braceL) => string prefix;
         if(prefix != "")
         {
-            <<<"key signature: ", prefix>>>;
+            //<<<"key signature: ", prefix>>>;
         }
         input.substring(braceL + 1) => string raw;
         if(!(raw.substring(raw.length()-1,1) == "]") )
@@ -125,14 +125,12 @@ public class EZscore
                 value * 2/3 => value;
             }
             0 => float add;
-            if(dots > 0)
+            while(dots > 0)
             {
-                for(int i; i < dots + 1; i++)
-                {
-                    value*Math.pow(.5, i) +=> add;
-                }
-                value * add => value;
+                Math.pow(.5, dots) * value +=> add;
+                dots--;
             }
+            add +=> value;
         }
 
         return value;
@@ -559,7 +557,7 @@ public class EZscore
 
 // Violin I
 "[k5s f5//r//r//r e d e//f//r//r//d e f e a4 b]" @=> string violinI_1_8;
-"[h.//h.//h.//q. e e e//h.//h.//h.//ex4 e e]" @=> string violinI_1_8_R;
+"[h.//h.//h.//q. e e e//h.//h.//h.//e e e e e e]" @=> string violinI_1_8_R;
 "[k5s d5 f c cn b//r r a b//d f c cn b//r r b c//a c d e es//f e f//d//r f e a4 b]" @=> string violinI_9_16;
 "[q. e e s s//q q e e//q. e e s s//q q e e//h sx4//h e e//h.//q e e e e]" @=> string violinI_9_16_R;
 "[k5s d5 f c cn b//r r a b//d f c cn b//r r b c//a r r//f g a c//d//r]" @=> string violinI_17_24;
@@ -571,7 +569,7 @@ public class EZscore
 "[k5s g5 r bd//a r gu//f r ad//b//e r b//a b a g c gu//f//an4 g an b c b c d e d e f]" @=> string violinI_41_48;
 "[h e e//h e e//h e e//h.//h e e//s s e q e e//h.//sx8 s s s s]" @=> string violinI_41_48_R;
 "[k5s g5//a b c g gu//f e d e f//cn6 an b an g du//e r b//a b a g a//b//r an e]" @=> string violinI_49_56;
-"[h.//e e q e e//q ex4//q s s e e e//h r e//s s e q q//h.//r q q]" @=> string violinI_49_56_R;
+"[h.//e e q e e//q ex4//q s s e e e//h e e//s s e q q//h.//q q q]" @=> string violinI_49_56_R;
 
 [violinI_1_8, violinI_9_16, violinI_17_24, violinI_25_32, violinI_33_40, violinI_41_48, violinI_49_56] @=> string violinI_pitch[];
 [violinI_1_8_R, violinI_9_16_R, violinI_17_24_R, violinI_25_32_R, violinI_33_40_R, violinI_41_48_R, violinI_49_56_R] @=> string violinI_rhythm[];
@@ -589,8 +587,8 @@ public class EZscore
 "[ex4 s s e//ex4 s s e//qx3//q q e e//qx3//q q e e//e e q e e//q q q]" @=> string flute_33_40_R;
 "[k5s r r r r r r r r]" @=> string flute_41_48;
 "[h.x7 h.]" @=> string flute_41_48_R;
-"[k5s f5//g a b g fu//e d c d e//a5 gn an gn d dnu//d r b//g a g f g b//dn b d b an//gn f e dn]" @=> string flute_49_56;
-"[h./e e q e e//q ex4//q s s ex3//h e e//s s e q e e//q s s e q//q q e e]" @=> string flute_49_56_R;
+"[k5s b5//c d e c bu//a g f g a//d6 cn dn cn g gnu//g r e//c d c b c e//gn e gn e dn//cn b an gn]" @=> string flute_49_56;
+"[h.//e e q e e//q ex4//q s s ex3//h e e//s s e q e e//q s s e q//q q e e]" @=> string flute_49_56_R;
 
 [flute_1_8, flute_9_16, flute_17_24, flute_25_32, flute_33_40, flute_41_48, flute_49_56] @=> string flute_pitch[];
 [flute_1_8_R, flute_9_16_R, flute_17_24_R, flute_25_32_R, flute_33_40_R, flute_41_48_R, flute_49_56_R] @=> string flute_rhythm[];
@@ -614,26 +612,33 @@ public class EZscore
 [tuba_1_8, tuba_9_16, tuba_17_24, tuba_25_32, tuba_33_40, tuba_41_48, tuba_49_56] @=> string tuba_pitch[];
 [tuba_1_8_R, tuba_9_16_R, tuba_17_24_R, tuba_25_32_R, tuba_33_40_R, tuba_41_48_R, tuba_49_56_R] @=> string tuba_rhythm[];
 
+string lilycove_p[7][0];
+string lilycove_r[7][0];
 
-EZscore mozart;
-mozart.setPitch(mozart_p);
-mozart.setRhythm(mozart_r);
-//mozart.n_voices => int N;
-
-1 => int which;
-EZscore inst[7];
 for(int i; i < 7; i++)
 {
-    inst[which].setPitch(tuba_pitch[which]);
-    inst[which].setRhythm(tuba_rhythm[which]);
+    [tuba_pitch[i], cello_pitch[i], viola_pitch[i], violinII_pitch[i], violinI_pitch[i], flute_pitch[i]] @=> lilycove_p[i];
+    [tuba_rhythm[i], cello_rhythm[i], viola_rhythm[i], violinII_rhythm[i], violinI_rhythm[i], flute_rhythm[i]] @=> lilycove_r[i];
 }
 
-//EZscore cello[7];
-//cello[which].setPitch(cello_pitch[which]);
-//cello[which].setRhythm(cello_rhythm[which]);
+EZscore lilycove_measures[7][6];
+for(int i; i < 7; i++)
+{
+    for(int j; j < 6; j++)
+    {
+        EZscore temp;
+        temp.setPitch(lilycove_p[i][j]);
+        temp.setRhythm(lilycove_r[i][j]);
+        //<<<"Part #: ",j," Measure ", i ," : ", temp.getTotalDur()>>>;
+        temp @=> lilycove_measures[i][j];
+    }
+}
+//EZscore mozart;
+//mozart.setPitch(mozart_p);
+//mozart.setRhythm(mozart_r);
+//mozart.n_voices => int N;
 
-//cello[which].printBoth();
-inst[which].n_voices => int N;
+
 //<<<"max voices: ", N>>>;
 
 //---------------------------------------------------------------------
@@ -642,10 +647,10 @@ inst[which].n_voices => int N;
 
 160 => float bpm;
 // t = 60*n/bpm sec
-SinOsc osc[N]; ADSR adsr[N];
+SinOsc osc[4]; ADSR adsr[4];
 Gain g => dac;
 g.gain(.25);
-for (int i; i < N; i++)
+for (int i; i < 4; i++)
 {
     osc[i] => adsr[i] => g;
     osc[i].gain(.5);
