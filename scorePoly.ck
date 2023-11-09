@@ -36,7 +36,7 @@ int camCol;
 [0,0] @=> int camFocus[];
 [5, 5] @=> int gridSize[];
 [@(0, 5, 10), @(0, 50, 1)] @=> vec3 camViews[];
-[10.0, 20.0] @=> float camHeight[];
+[7.0, 20.0] @=> float camHeight[];
 GG.camera().orthographic();
 GG.camera().viewSize(camHeight[0]);
 GG.camera().pos(camViews[0]);
@@ -386,11 +386,10 @@ class Ring extends GGen
     }
 }
 
-
 //---------------------------------------------------------------------
 // Testing
 //---------------------------------------------------------------------
-"[k2s f4:a:du r g fs e fs a g fs g a r a b csd d au fs a g fs g a g fs d r]" => string mozart_p;
+"[k2s f4:a:du r e:g d:fs c:e d:fs f:a e:g d:fs e:g d:f:a r a b csd d d:f:au d:fs f:a e:g d:fs e:g f:a e:g fs d r]" => string mozart_p;
 "[q q sx8 q q e e e e q q sx4 e e e q. h]" => string mozart_r;
 
 EZscore melody;
