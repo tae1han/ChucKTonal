@@ -53,7 +53,7 @@ class Ring extends GGen
     GGen ringParent;
     GSphere spheres[0];
     GLines lines[0];
-    ringParent --> scene;
+    //ringParent --> scene;
 
     // graphics variables
     0 => float offset;
@@ -118,7 +118,7 @@ class Ring extends GGen
             x.mat().polygonMode( Material.POLYGON_FILL );
             x.mat().color(@(0, 0, 0));
             x.sca(@(.05, .05, .05));
-            x --> ringParent;
+            //x --> ringParent;
         }
 
         // position sphere x-direction scaled to rhythmic duration
@@ -158,7 +158,7 @@ class Ring extends GGen
         for (auto l : lines)
         {
             l.mat().color(@(0, 0, 0));
-            l --> ringParent;
+            //l --> ringParent;
         }
         for(int i; i < _size; i++) // each X-Z position along ring
         {
@@ -322,7 +322,7 @@ class RingStack extends GGen
     EZscore melodies[];
     int _size;
     GGen stackParent;
-    stackParent --> scene;
+    //stackParent --> scene;
 
     2 => float max_displacement;
     2.5 => float max_radius;
@@ -362,8 +362,8 @@ class RingStack extends GGen
             {
                 thisDuration => maxDuration;
             }
-            rings[i].ringParent --< scene;
-            rings[i].ringParent --> stackParent;
+            //rings[i].ringParent --< scene;
+            //rings[i].ringParent --> stackParent;
         }
     }
 
@@ -396,7 +396,7 @@ class RingStack extends GGen
     {
         for(auto r : rings)
         {
-            spork~r.playScene();
+            //spork~r.playScene();
             (60*(r.totalDuration)/r.local_bpm)::second => dur waitTime;
             beats*(T/waitTime) => float N;
             spork~r.repeatMelody(Math.ceil(N)$int);
@@ -412,7 +412,7 @@ class RingGrid extends GGen
     RingStack cells[];
     int _rows;
     int _cols;
-    this --> scene;
+    //this --> scene;
 
     int repeatSequence[];
 
@@ -603,13 +603,13 @@ for(int i; i < 7; i++)
 //RingStack stack;
 //stack.init(lilycove_measures[6]);
 //stack.loopPlay();
-2 => int N;
+7 => int N;
 RingStack stacks[N];
 
 for(int i; i < N; i++)
 {
     RingStack temp;
-    temp.init(lilycove_measures[i+5]);
+    temp.init(lilycove_measures[i]);
     temp @=> stacks[i];
 }
 
