@@ -603,7 +603,7 @@ for(int i; i < 7; i++)
 //RingStack stack;
 //stack.init(lilycove_measures[6]);
 //stack.loopPlay();
-2 => int N;
+3 => int N;
 RingStack stacks[N];
 
 for(int i; i < N; i++)
