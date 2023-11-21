@@ -486,8 +486,4 @@ public class EZscore
 // tied notes
 // better debugging tools or ways to ensure valid line-up between pitch and rhythm
 // measure flags -> force alignment?
-
-// chords
 // velocity stream
-
-// on-screen type in 
