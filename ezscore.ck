@@ -26,13 +26,7 @@ public class EZscore
     fun string clean_input(string input)
     {
         input.replace("//", " ");
-        //<<<input>>>;
         input.find("[") => int braceL;
-        input.substring(0, braceL) => string prefix;
-        if(prefix != "")
-        {
-            //<<<"key signature: ", prefix>>>;
-        }
         input.substring(braceL + 1) => string raw;
         if(!(raw.substring(raw.length()-1,1) == "]") )
         {
@@ -57,20 +51,16 @@ public class EZscore
                 count++;
             }
         }
-        //count++;
-        //<<<count>>>;
-        0 => int j;
 
+        0 => int j;
         string out[count+1];
 
         while(copy.find(delim) != -1)
         {
             copy.find(delim) => int ix;
             copy.substring(0, ix) => string curr;
-            //<<<curr>>>;
             curr => out[j];
             copy.substring(ix + 1) => copy;
-            //<<<copy>>>;
             j++;
         }
         if (copy.length() > 0) 
@@ -78,15 +68,17 @@ public class EZscore
             copy => out[j];
         }
 
-
         return out;
     }
+
     //---------------------------------------------------------------------
     /// RHYTHM PARSING
     //---------------------------------------------------------------------
+
     ["s", "e", "q", "h", "w"] @=> string durationLabels[];
     [.25, .5, 1.0, 2.0, 4.0] @=> float durationVals[];
     float durationMap[5];
+
     for (int i; i< durationVals.size(); i++)
     {
         durationVals[i] => durationMap[durationLabels[i]];
@@ -144,28 +136,20 @@ public class EZscore
             if(input.substring(i, 1) == "x")
             {
                 input.substring(0, i) => string LH;
-                //<<<"LH: ", LH>>>;
                 LH.substring(LH.rfind(" ") + 1) => string temp;
-                //<<<"to clone: ", temp, " length: ", temp.length()>>>;
                 " " => string toclone;
                 toclone.insert(0, temp);
-                //<<<"to clone (w space): ", toclone, " length: ", toclone.length()>>>;
                 input.substring(i) => string RH;
-                //<<<"RH: ", RH>>>;
                 RH.substring(1, RH.find(" ") - 1) => string numStr;
                 numStr.toInt() => int num;
-                //<<<"num: ", num>>>;
                 "" => string newstr;
                 for (0 => int j; j < num; j++)
                 {
                     newstr + toclone => newstr;
                 }
                 newstr.rtrim() => newstr;
-                //<<<"newstr: ", newstr>>>;
                 input.replace(i-(toclone.length()-1), RH.find(" ")+(toclone.length()-1), "");
-                //<<<"trimmed input: ", input>>>;
                 input.insert(i-(toclone.length()-1), newstr);
-                //<<<"with inserted newstr: ", input>>>;
             }
         }
         split_delim(input, " ") @=> string strOut[];
@@ -176,9 +160,11 @@ public class EZscore
         }
         return output;
     }
+
     //---------------------------------------------------------------------
     /// PITCH PARSING
     //---------------------------------------------------------------------
+
     ["c", "d", "e", "f", "g", "a", "b", "r"] @=> string base_pitches[];
     [12, 14, 16, 17, 19, 21, 23, -999] @=> int base_notes[];
     int pitch_map[7];
@@ -197,7 +183,6 @@ public class EZscore
         {
             key.substring(2,1) => string type;
             Std.atoi(key.substring(1,1)) => int n;
-            //<<<"type: ", type, " n: ", n>>>;
 
             if(type == "s")
             {
@@ -359,15 +344,17 @@ public class EZscore
             return name;
         }
     }
-    // API 
-    
 
+    ///////////////////////////////////////////////////////////////////////
+    // API 
+    ///////////////////////////////////////////////////////////////////////
 
     fun void setPitch(string input)
     {
         parse_pitch(input) @=> pitches;
         pitches.size() => length;
     }
+
     fun void setRhythm(string input)
     {
         parse_rhythm(input) @=> durations;
@@ -391,19 +378,6 @@ public class EZscore
         return count;
     }
 
-    fun float getTotalDur()
-    {
-        return totalDuration;
-    }
-    fun int[][] getPitches()
-    {
-        return pitches;
-    }
-    fun float[] getRhythm()
-    {
-        return durations;
-    }
-
     fun int getLowestNote()
     {
         999 => int lowest;
@@ -423,6 +397,7 @@ public class EZscore
 
         return lowest;
     }
+
     fun int getHighestNote()
     {
         -999 => int highest;
@@ -455,6 +430,7 @@ public class EZscore
 
         }
     }
+
     fun void printRhythms()
     {   
 		<<<"# of durations: ", durations.size()>>>;
@@ -464,7 +440,7 @@ public class EZscore
         }
     }
 
-	fun void printBoth()
+	fun void printPitchRhythm()
 	{
 		for(int i; i < durations.size(); i++)
 		{
@@ -477,7 +453,6 @@ public class EZscore
             chout <= IO.newline() <= "duration: " <= durations[i] <= IO.newline();
 		}
 	}
-
 }
 
 

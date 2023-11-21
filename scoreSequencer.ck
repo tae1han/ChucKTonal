@@ -122,7 +122,7 @@ class Ring extends GGen
         }
 
         // position sphere x-direction scaled to rhythmic duration
-        2*pi / m.getTotalDur() => dTheta;
+        2*pi / totalDuration => dTheta;
 
         // position sphere y-direction scaled to pitch
         m.getLowestNote() => lowP;
