@@ -2,19 +2,8 @@
 // Testing
 //---------------------------------------------------------------------
 
-"[ef4 efu d bf c d ef efd cu bf]" => string rainbow;
-//"k2s[roll/f4:a:du/ r g5 f e f a g f g a r a b c d a f a g f g a g es f]" => string mozart_p;
-//[roll/fs4:a:du/ r g5 fs e fs a g fs g a r a b cs d a fs a g fs g a g es fs]" => string mozart_p;
-"[k2s f4:a:du r e:g d:fs c:e d:fs f:a e:g d:fs e:g d:f:a r a b csd d au fs f:a e:g d:fs e:g f:a g fs d]" => string mozart_p;
-"[c5 e g bd cu d c a g cu gd f e f e]" => string mozart_p2;
-"[h q q q. sx2 h h qx4 te te te q]" => string mozart_r2;
-"[q q sx8 q q e e e e q q sx4 e e e q.]" => string mozart_r;
-"[a5 r cu r ad bf gf ef bfu af f df afd gfu dn r fs e d cs e d d bfd g a f ef r du cs d f ef bd af dfu bfd r bf a af g bn a f e d f f d g r r]" => string coltrane_p;
-"[a5 r c r a bf gf ef bfu af f df af gfu dn r fs e d cs e d d bf g a f ef r du cs d f ef b af df bf r bf a af g bn a f e d f f d g r r]" => string coltrane2_p;
-"[ex25 q e q. q ex8 q ex6 ex7 q. h e]" => string coltrane_r;
-"[k2f//f4//b du c bd eu df dn f//r e f e//r d e d c ad b du//c gd b a r b//g b du bd r//enu ef gfd b cu d//f bnd r afu r gf//gn e bd g du f]" => string anthropology_p1;
-"[k2f//f4//b d c b e df dn f//r e f e//r d e d c a b d//c g b a r b//g b d b r//enu ef gfd b c d//f bnd r afu r gf//gn e b g du f]" => string anthropology_p2;
-"[e//ex8//q. q e q//e ex7//ex4 q. q.//ex5//q q q e e e//q. e ex4//ex4 e q]" => string anthropology_r1;
+"[k2s f4:a:du r e:g d:fs c:e d:fs f:a e:g d:fs e:g d:f:a r a b csd d d:f:au d:fs f:a e:g d:fs e:g f:a e:g fs d r]" => string mozart_p;
+"[q q sx8 q q e e e e q q sx4 e e e q. h]" => string mozart_r;
 
 // Cello
 "[k5s b2 fu es f//fd fu f//bd fu f//fd fu f//b2 fu es f//fd fu f//bd fu f//fd fu es f]" @=> string cello_1_8;
@@ -130,64 +119,146 @@
 [tuba_1_8, tuba_9_16, tuba_17_24, tuba_25_32, tuba_33_40, tuba_41_48, tuba_49_56] @=> string tuba_pitch[];
 [tuba_1_8_R, tuba_9_16_R, tuba_17_24_R, tuba_25_32_R, tuba_33_40_R, tuba_41_48_R, tuba_49_56_R] @=> string tuba_rhythm[];
 
-string lilycove_p[7][0];
-string lilycove_r[7][0];
 
-for(int i; i < 7; i++)
+EZscore tuba;
+tuba.setPitch(tuba_pitch);
+tuba.setRhythm(tuba_rhythm);
+
+EZscore cello;
+cello.setPitch(cello_pitch);
+cello.setRhythm(cello_rhythm);
+
+EZscore viola;
+viola.setPitch(viola_pitch);
+viola.setRhythm(viola_rhythm);
+
+EZscore violinII;
+violinII.setPitch(violinII_pitch);
+violinII.setRhythm(violinII_rhythm);
+
+EZscore violinI;
+violinI.setPitch(violinI_pitch);
+violinI.setRhythm(violinI_rhythm);
+
+EZscore flute;
+flute.setPitch(flute_pitch);
+flute.setRhythm(flute_rhythm);
+
+EZscore fullScore[];
+
+[tuba, cello, viola, violinII, violinI, flute] @=> fullScore;
+
+0 => int total_voices;
+for(int i; i < fullScore.size(); i++)
 {
-    [tuba_pitch[i], cello_pitch[i], viola_pitch[i], violinII_pitch[i], violinI_pitch[i], flute_pitch[i]] @=> lilycove_p[i];
-    [tuba_rhythm[i], cello_rhythm[i], viola_rhythm[i], violinII_rhythm[i], violinI_rhythm[i], flute_rhythm[i]] @=> lilycove_r[i];
+    fullScore[i].n_voices +=> total_voices;
 }
 
-EZscore lilycove_measures[7][6];
-for(int i; i < 7; i++)
+
+class ScorePlayer
 {
-    for(int j; j < 6; j++)
+    EZscore score;
+    int pitches[][];
+    float durations[];
+
+    int n_voices;
+    SinOsc oscs[];
+    ADSR envs[];
+    Gain bus;
+
+    160 => float local_bpm;
+
+    fun void init(EZscore s)
     {
-        EZscore temp;
-        temp.setPitch(lilycove_p[i][j]);
-        temp.setRhythm(lilycove_r[i][j]);
-        //<<<"Part #: ",j," Measure ", i ," : ", temp.getTotalDur()>>>;
-        temp @=> lilycove_measures[i][j];
+        s @=> score;
+        s.n_voices => n_voices;
+        s.pitches @=> pitches;
+        s.durations @=> durations;
+        init_sound();
     }
+
+    fun void init_sound()
+    {
+        SinOsc temp_oscs[n_voices] @=> oscs;
+        ADSR temp_envs[n_voices] @=> envs;
+        bus.gain(.25);
+        for (int i; i < n_voices; i++)
+        {
+            oscs[i] => envs[i] => bus => dac;
+            oscs[i].gain(1/n_voices);
+            envs[i].set(10::ms, 500::ms, 0.0, 50::ms);
+        }
+    }
+
+    fun void playNote(int which, int note, float duration)
+    {
+        if(note >= 0)
+        {
+            Std.mtof(note) => oscs[which].freq;
+            envs[which].keyOn();
+        }
+    }
+
+    fun void play()
+    {
+        //need to also check that the note and duration streams are the same length
+        for(int i; i < pitches.size(); i++)
+        {
+            for(int j; j < pitches[i].size(); j++)
+            {
+                spork ~ playNote(j, pitches[i][j], durations[i]);
+            }
+            60*durations[i]/local_bpm => float durTime;
+            durTime::second => now;
+        }
+    }
+
+    fun void printPitches()
+    {
+		<<<"# of pitches: ", pitches.size()>>>;
+        for (int i; i < pitches.size(); i++)
+        {
+            pitches[i] @=> int curr[];
+            for(auto p : curr)
+            {
+                <<<p>>>;
+            }
+
+        }
+    }
+
+    fun void printRhythms()
+    {   
+		<<<"# of durations: ", durations.size()>>>;
+        for(auto r : durations)
+        {
+            <<<r>>>;
+        }
+    }
+
 }
-
-
 //---------------------------------------------------------------------
 // Testing playback
 //---------------------------------------------------------------------
 
 160 => float bpm;
-// t = 60*n/bpm sec
-SinOsc osc[4]; ADSR adsr[4];
-Gain g => dac;
-g.gain(.25);
-for (int i; i < 4; i++)
+
+ScorePlayer player[fullScore.size()];
+
+for(int i; i < fullScore.size(); i++)
 {
-    osc[i] => adsr[i] => g;
-    osc[i].gain(.5);
-    adsr[i].set(10::ms, 500::ms, 0.0, 50::ms);
+    ScorePlayer sp;
+    sp.init(fullScore[i]);
+    sp @=> player[i];
 }
 
-fun void play(int which, int note, float duration)
+
+for(int i; i < player.size(); i++)
 {
-    if(note >= 0)
-    {
-        Std.mtof(note) => osc[which].freq;
-        adsr[which].keyOn();
-    }
+    spork ~ player[i].play();
 }
 
-fun void playStreams(int notes[][], float durations[])
+while(true)
 {
-    //need to also check that the note and duration streams are the same length
-    for(int i; i < notes.size(); i++)
-    {
-        for(int j; j < notes[i].size(); j++)
-        {
-            spork ~ play(j, notes[i][j], durations[i]);
-        }
-        60*durations[i]/bpm => float durTime;
-        durTime::second => now;
-    }
+    1::second => now;
 }

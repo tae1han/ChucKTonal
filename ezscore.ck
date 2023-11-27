@@ -355,10 +355,53 @@ public class EZscore
         pitches.size() => length;
     }
 
+    fun void setPitch(string input[])
+    {
+        int temp[0][0];
+        0 => int tempLength;
+        for(int i; i < input.size(); i++)
+        {
+            int thisMeasure[][];
+            parse_pitch(input[i]) @=> thisMeasure;
+            thisMeasure.size() +=> tempLength;
+            for(int j; j < thisMeasure.size(); j++)
+            {
+                temp << thisMeasure[j];
+            }
+        }
+        temp @=> pitches;
+        pitches.size() => length;
+    }
+
     fun void setRhythm(string input)
     {
         parse_rhythm(input) @=> durations;
         durations.size() => length;
+        0 => float sum;
+        for(auto i : durations)
+        {
+            i +=> sum;
+        }
+
+        sum => totalDuration;
+    }
+    
+    fun void setRhythm(string input[])
+    {
+        float temp[0];
+        0 => int tempLength;
+        for(int i; i < input.size(); i++)
+        {
+            float thisMeasure[];
+            parse_rhythm(input[i]) @=> thisMeasure;
+            thisMeasure.size() +=> tempLength;
+            for(int j; j < thisMeasure.size(); j++)
+            {
+                temp << thisMeasure[j];
+            }
+        }
+        temp @=> durations;
+        
         0 => float sum;
         for(auto i : durations)
         {

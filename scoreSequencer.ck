@@ -609,7 +609,7 @@ RingStack stacks[N];
 for(int i; i < N; i++)
 {
     RingStack temp;
-    temp.init(lilycove_measures[i]);
+    temp.init(lilycove_measures[i + 2]);
     temp @=> stacks[i];
 }
 

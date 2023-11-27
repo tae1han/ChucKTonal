@@ -459,7 +459,7 @@ for(int i; i < 7; i++)
 }
 
 Part p;
-p.init(lilycove_measures[5][0]);
+p.init(lilycove_measures[4][5]);
 spork ~ p.loopMelody();
 spork ~ p.playScene();
 
