@@ -67,7 +67,6 @@ public class EZscore
         {
             copy => out[j];
         }
-
         return out;
     }
 
@@ -128,36 +127,52 @@ public class EZscore
         return value;
 
     }
+
+    fun string[] handle_repeat(string input)
+    {
+        string expanded[0];
+        input.substring(0, input.find("x")) => string toClone;
+        input.substring(input.find("x") + 1) => string toRepeat;
+        toRepeat.toInt() => int nTimes;
+        for(int i; i < nTimes; i++)
+        {
+            expanded << toClone;
+        }
+        return expanded;
+    }
+
     fun float[] parse_rhythm(string raw)
     {
-        clean_input(raw) => string input;
-        for(int i; i < input.length(); i++)
+        float output[0];
+
+        split_delim(clean_input(raw), " ") @=> string input[];
+
+        for(int i; i < input.size(); i++)
         {
-            if(input.substring(i, 1) == "x")
+            // handle repeat flag
+            if(input[i].find("x") != -1)
             {
-                input.substring(0, i) => string LH;
-                LH.substring(LH.rfind(" ") + 1) => string temp;
-                " " => string toclone;
-                toclone.insert(0, temp);
-                input.substring(i) => string RH;
-                RH.substring(1, RH.find(" ") - 1) => string numStr;
-                numStr.toInt() => int num;
-                "" => string newstr;
-                for (0 => int j; j < num; j++)
+                handle_repeat(input[i]) @=> string repeated[];
+                for(auto x : repeated)
                 {
-                    newstr + toclone => newstr;
+                    output << parseDuration(x);
                 }
-                newstr.rtrim() => newstr;
-                input.replace(i-(toclone.length()-1), RH.find(" ")+(toclone.length()-1), "");
-                input.insert(i-(toclone.length()-1), newstr);
+            }
+            else
+            {
+                // handle ties -- add to previous duration
+                if(input[i].find("_") != -1)
+                {
+                    parseDuration(input[i].substring(1)) +=> output[-1];
+                }
+                // add to rhythm array
+                else
+                {
+                    output << parseDuration(input[i]);
+                }
             }
         }
-        split_delim(input, " ") @=> string strOut[];
-        float output[0];
-        for(auto i : strOut)
-        {
-            output << parseDuration(i);
-        }
+        
         return output;
     }
 
@@ -229,100 +244,117 @@ public class EZscore
 
         for(auto item : split) // for each element in input list
         {
-            int chord[0];
-            split_delim(item, ":") @=> string curr_split[];
-            for (auto curr : curr_split)
+            if(item.find("_") == -1)
             {
-                0 => int step;
-                0 => int alter;
-                int pitch;
-                0 => int octFlag;
-                0 => int dirFlag;
-                // future: need to check if "first" is indeed a valid pitch/step
-                curr.substring(0,1) => string first;
-                pitch_map[first] => step;
-                if(key.isInMap(first)) 
+                1 => int nTimes;
+                if(item.find("x") != -1)
                 {
-                    key[first] => alter; // apply key signature from key vector
+                    item.substring(0, item.find("x")) => string toClone;
+                    item.substring(item.find("x") + 1) => string toRepeat;
+                    toRepeat.toInt() => nTimes;
+                    toClone @=> item;
                 }
-                curr.erase(0,1);
-                step + alter => pitch;
-                if(curr.length() == 0 && pitch > 0) // if no more flags after step/alter, check proximity for octave
+
+                int chord[0];
+                split_delim(item, ":") @=> string curr_split[];
+                for (auto curr : curr_split)
                 {
-                    if(pitch - last > 6)
+                    0 => int step;
+                    0 => int alter;
+                    int pitch;
+                    0 => int octFlag;
+                    0 => int dirFlag;
+                    // future: need to check if "first" is indeed a valid pitch/step
+                    curr.substring(0,1) => string first;
+                    pitch_map[first] => step;
+                    if(key.isInMap(first)) 
                     {
-                        //octave--;
+                        key[first] => alter; // apply key signature from key vector
                     }
-                    if(pitch - last <= -6)
+                    curr.erase(0,1);
+                    step + alter => pitch;
+                    if(curr.length() == 0 && pitch > 0) // if no more flags after step/alter, check proximity for octave
                     {
-                        //octave++;
-                    }
-                }
-                while(curr.length() > 0) // go through each character in element
-                {
-                    curr.substring(0,1) => first;
-                    //handle alter flag if there
-                    if(first == "f")
-                    {
-                        -1 => alter;
-                    }
-                    if(first == "s")
-                    {
-                        1 => alter;
-                    }
-                    if(first == "n")
-                    {
-                        0 => alter;
-                    }
-                    // handle explicit octave number flag
-                    if(first.toInt() != 0)
-                    {
-                        Std.atoi(first) => octave;
-                        1 => octFlag;
-                    }
-                    // handle interval direction flags (octave flag overrides)
-                    if(first == "u" && octFlag == 0)
-                    {
-                        if(pitch - last <= 6)
+                        if(pitch - last > 6)
                         {
-                            octave++;
+                            //octave--;
                         }
-                        1 => dirFlag;
+                        if(pitch - last <= -6)
+                        {
+                            //octave++;
+                        }
                     }
-                    if(first == "d" && octFlag == 0)
+                    while(curr.length() > 0) // go through each character in element
                     {
-                        if(pitch - last > -6)
+                        curr.substring(0,1) => first;
+                        //handle alter flag if there
+                        if(first == "f")
+                        {
+                            -1 => alter;
+                        }
+                        if(first == "s")
+                        {
+                            1 => alter;
+                        }
+                        if(first == "n")
+                        {
+                            0 => alter;
+                        }
+                        // handle explicit octave number flag
+                        if(first.toInt() != 0)
+                        {
+                            Std.atoi(first) => octave;
+                            1 => octFlag;
+                        }
+                        // handle interval direction flags (octave flag overrides)
+                        if(first == "u" && octFlag == 0)
+                        {
+                            if(pitch - last <= 6)
+                            {
+                                octave++;
+                            }
+                            1 => dirFlag;
+                        }
+                        if(first == "d" && octFlag == 0)
+                        {
+                            if(pitch - last > -6)
+                            {
+                                octave--;
+                            }
+                            1 => dirFlag;
+                        }
+                        curr.erase(0,1);
+                    }
+                    // set octave based on proximity--tritone always favors higher octave
+                    // direction flag (and octave flag) overrides
+                    if (octFlag == 0 && dirFlag == 0 && pitch > 0)
+                    {
+                        if(pitch - last > 6)
                         {
                             octave--;
                         }
-                        1 => dirFlag;
+                        if(pitch - last <= -6)
+                        {
+                            octave++;
+                        }
                     }
-                    curr.erase(0,1);
-                }
-                // set octave based on proximity--tritone always favors higher octave
-                // direction flag (and octave flag) overrides
-                if (octFlag == 0 && dirFlag == 0 && pitch > 0)
-                {
-                    if(pitch - last > 6)
+                    if (step > 0)
                     {
-                        octave--;
+                        step + alter => last;
                     }
-                    if(pitch - last <= -6)
-                    {
-                        octave++;
-                    }
+                    chord << step + alter + 12*octave;
                 }
-                if (step > 0)
+
+                if(chord.size() > n_voices)
                 {
-                    step + alter => last;
+                    chord.size() => n_voices;
                 }
-                chord << step + alter + 12*octave;
+
+                for(int i; i < nTimes; i++)
+                {
+                    output << chord;
+                }
             }
-            if(chord.size() > n_voices)
-            {
-                chord.size() => n_voices;
-            }
-            output << chord;
         }
         return output;
     }
