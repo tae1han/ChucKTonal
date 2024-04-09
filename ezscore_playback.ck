@@ -15,7 +15,7 @@ class ScorePlayer
 {
     EZscore score;
     int pitches[][];
-    float durations[];
+    float rhythms[];
 
     int n_voices;
     SinOsc oscs[];
@@ -24,12 +24,16 @@ class ScorePlayer
 
     120 => float local_bpm;
 
+    fun ScorePlayer(EZscore s)
+    {
+        init(s);
+    }
     fun void init(EZscore s)
     {
         s @=> score;
         s.n_voices => n_voices;
         s.pitches @=> pitches;
-        s.durations @=> durations;
+        s.rhythms @=> rhythms;
         init_sound();
     }
 
@@ -41,7 +45,7 @@ class ScorePlayer
         for (int i; i < n_voices; i++)
         {
             oscs[i] => envs[i] => bus => dac;
-            oscs[i].gain(1/n_voices);
+            oscs[i].gain(1.0/(n_voices $ float));
             envs[i].set(10::ms, 500::ms, 0.0, 50::ms);
         }
     }
@@ -62,9 +66,9 @@ class ScorePlayer
         {
             for(int j; j < pitches[i].size(); j++)
             {
-                spork ~ playNote(j, pitches[i][j], durations[i]);
+                spork ~ playNote(j, pitches[i][j], rhythms[i]);
             }
-            60*durations[i]/local_bpm => float durTime;
+            60*rhythms[i]/local_bpm => float durTime;
             durTime::second => now;
         }
     }
@@ -85,8 +89,8 @@ class ScorePlayer
 
     fun void printRhythms()
     {   
-		<<<"# of durations: ", durations.size()>>>;
-        for(auto r : durations)
+		<<<"# of rhythms: ", rhythms.size()>>>;
+        for(auto r : rhythms)
         {
             <<<r>>>;
         }
@@ -109,20 +113,21 @@ class ScorePlayer
 "[k2s d3 f d f d f g f//e a e a e a e a//e a e a e a g a//f a f a f a g a]" @=> string part3mel;
 "[ex8//ex8//ex8//ex8]" @=> string part3rhy;
 
-EZscore part1;
-part1.setPitch(part1mel);
-part1.setRhythm(part1rhy);
+EZscore part1(part1mel, part1rhy);
+// part1.setPitch(part1mel);
+// part1.setRhythm(part1rhy);
+//part1.shuffle();
 part1.printPitchRhythm();
 
-EZscore part2;
-part2.setPitch(part2mel);
-part2.setRhythm(part2rhy);
+EZscore part2(part2mel, part2rhy);
+// part2.setPitch(part2mel);
+// part2.setRhythm(part2rhy);
+//part2.shuffle();
 
-EZscore part3;
-part3.setPitch(part3mel);
-part3.setRhythm(part3rhy);
-
-
+EZscore part3(part3mel, part3rhy);
+// part3.setPitch(part3mel);
+// part3.setRhythm(part3rhy);
+//part3.shuffle();
 // EZscore array to contain all parts
 
 EZscore fullScore[];
@@ -146,8 +151,8 @@ ScorePlayer player[fullScore.size()];
 
 for(int i; i < fullScore.size(); i++)
 {
-    ScorePlayer sp;
-    sp.init(fullScore[i]);
+    ScorePlayer sp(fullScore[i]);
+    //sp.init(fullScore[i]);
     bpm => sp.local_bpm;
     sp @=> player[i];
 }

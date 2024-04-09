@@ -159,10 +159,10 @@ class ScorePlayer
 {
     EZscore score;
     int pitches[][];
-    float durations[];
+    float rhythms[];
 
     int n_voices;
-    SinOsc oscs[];
+    TriOsc oscs[];
     ADSR envs[];
     Gain bus;
 
@@ -173,19 +173,19 @@ class ScorePlayer
         s @=> score;
         s.n_voices => n_voices;
         s.pitches @=> pitches;
-        s.durations @=> durations;
+        s.rhythms @=> rhythms;
         init_sound();
     }
 
     fun void init_sound()
     {
-        SinOsc temp_oscs[n_voices] @=> oscs;
+        TriOsc temp_oscs[n_voices] @=> oscs;
         ADSR temp_envs[n_voices] @=> envs;
         bus.gain(.25);
         for (int i; i < n_voices; i++)
         {
             oscs[i] => envs[i] => bus => dac;
-            oscs[i].gain(1/n_voices);
+            oscs[i].gain(1.0/(n_voices $ float));
             envs[i].set(10::ms, 500::ms, 0.0, 50::ms);
         }
     }
@@ -206,9 +206,9 @@ class ScorePlayer
         {
             for(int j; j < pitches[i].size(); j++)
             {
-                spork ~ playNote(j, pitches[i][j], durations[i]);
+                spork ~ playNote(j, pitches[i][j], rhythms[i]);
             }
-            60*durations[i]/local_bpm => float durTime;
+            60*rhythms[i]/local_bpm => float durTime;
             durTime::second => now;
         }
     }
@@ -229,8 +229,8 @@ class ScorePlayer
 
     fun void printRhythms()
     {   
-		<<<"# of durations: ", durations.size()>>>;
-        for(auto r : durations)
+		<<<"# of rhythms: ", rhythms.size()>>>;
+        for(auto r : rhythms)
         {
             <<<r>>>;
         }

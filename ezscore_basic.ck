@@ -52,7 +52,7 @@ melody.setRhythm(rhythms);
 melody.printPitchRhythm();
 // Use .printPitches() to check just the MIDI note numbers
 melody.printPitches();
-// Use .printRhythms() to check just the note durations in beats
+// Use .printRhythms() to check just the note rhythms in beats
 melody.printRhythms();
 
 // For the subsequent examples, try reassigning the pitch/rhythm sequence

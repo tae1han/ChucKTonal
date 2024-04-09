@@ -33,7 +33,7 @@
 
 public class EZchord
 {
-    // pseudo-static member variables
+    // static member variables
     int pitch_dict[7];
     0 => pitch_dict["C"];
     2 => pitch_dict["D"];
@@ -74,6 +74,15 @@ public class EZchord
     string _triadType;
     int _extension[];
     string _suffix;
+
+    fun EZchord(string in)
+    {
+        in => _input;
+        setRoot();
+        setTriad();
+        setExtension();
+        setNotes();        
+    }
 
     fun void init(string in)
     {

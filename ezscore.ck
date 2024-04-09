@@ -4,8 +4,8 @@
 // This file introduces a way to quickly and easily input notes and rhythms,
 // based primarily on the SCORE4 system. Pitches and rhythms are assigned
 // as strings. These are parsed in the Melody class and interpreted as
-// an int array of MIDI notes (pitch) and a float array for durations
-// (not ChucK durations, but beat values).
+// an int array of MIDI notes (pitch) and a float array for rhythms
+// (not ChucK rhythms, but beat values).
 // 
 //
 // Alex Han 2023
@@ -18,7 +18,7 @@ public class EZscore
     float totalDuration;
     
     int pitches[][];
-    float durations[];
+    float rhythms[];
 
     //---------------------------------------------------------------------
     // helper functions
@@ -87,6 +87,7 @@ public class EZscore
     {
         0 => int dots;
         0 => int isTriplet;
+        1 => int tupletDenom;
         float value;
 
         if(Std.atof(input) != 0)
@@ -101,6 +102,10 @@ public class EZscore
                 if(curr == "t")
                 {
                     1 => isTriplet;
+                }
+                if(curr == "/" &&  Std.atoi(input.substring((i+1,1))) != 0)
+                {
+                    Std.atoi(input.substring((i+1,1))) => tupletDenom;
                 }        
                 if(curr == ".")
                 {
@@ -124,7 +129,7 @@ public class EZscore
             add +=> value;
         }
 
-        return value;
+        return value/tupletDenom;
 
     }
 
@@ -380,7 +385,33 @@ public class EZscore
     ///////////////////////////////////////////////////////////////////////
     // API 
     ///////////////////////////////////////////////////////////////////////
+    //
+    //
+    //---------------------------------------------------------------------
+    // Constructors
+    //---------------------------------------------------------------------
 
+    fun EZscore(string pitches)
+    {
+        setPitch(pitches);
+        float temp[0];
+        for(int i; i < length; i++)
+        {
+            temp << 1.0;
+        }
+        temp @=> rhythms;
+    }
+
+    fun EZscore(string pitches, string rhythms)
+    {
+        setPitch(pitches);
+        setRhythm(rhythms);
+    }
+
+
+    //---------------------------------------------------------------------
+    // Basics
+    //---------------------------------------------------------------------
     fun void setPitch(string input)
     {
         parse_pitch(input) @=> pitches;
@@ -407,10 +438,10 @@ public class EZscore
 
     fun void setRhythm(string input)
     {
-        parse_rhythm(input) @=> durations;
-        durations.size() => length;
+        parse_rhythm(input) @=> rhythms;
+        rhythms.size() => length;
         0 => float sum;
-        for(auto i : durations)
+        for(auto i : rhythms)
         {
             i +=> sum;
         }
@@ -432,10 +463,10 @@ public class EZscore
                 temp << thisMeasure[j];
             }
         }
-        temp @=> durations;
+        temp @=> rhythms;
         
         0 => float sum;
-        for(auto i : durations)
+        for(auto i : rhythms)
         {
             i +=> sum;
         }
@@ -508,8 +539,8 @@ public class EZscore
 
     fun void printRhythms()
     {   
-		<<<"# of durations: ", durations.size()>>>;
-        for(auto r : durations)
+		<<<"# of rhythms: ", rhythms.size()>>>;
+        for(auto r : rhythms)
         {
             <<<r>>>;
         }
@@ -517,7 +548,7 @@ public class EZscore
 
 	fun void printPitchRhythm()
 	{
-		for(int i; i < durations.size(); i++)
+		for(int i; i < rhythms.size(); i++)
 		{
             pitches[i] @=> int curr[];
             chout <= "note: ";
@@ -525,9 +556,274 @@ public class EZscore
             {
                 chout <= mid2str(x) <= " ";
             }
-            chout <= IO.newline() <= "duration: " <= durations[i] <= IO.newline();
+            chout <= IO.newline() <= "duration: " <= rhythms[i] <= IO.newline();
 		}
 	}
+    //---------------------------------------------------------------------
+    // Sequence modulators
+    //---------------------------------------------------------------------
+
+    // appends the provided sequence to the current one
+    fun void add(EZscore seq)
+    {
+        seq.pitches @=> int newPitches[][];
+        seq.rhythms @=> float newDurations[];
+
+        for(int i; i < newPitches.size(); i++)
+        {
+            pitches << newPitches[i];
+        }
+
+        for(int j; j < newDurations.size(); j++)
+        {
+            rhythms << newDurations[j];
+        }
+    }
+
+    // transpose each pitch to the "average" of the elementwise intervals 
+    // between the pitches in the current sequence and a given sequence
+    fun void average(EZscore seq)
+    {
+        
+    }
+
+    // breaks up any chord elements in the sequence into ascending arpeggios with constant duration (quarter note)
+    fun void arpeggiate()
+    {
+        
+    }
+
+    // breaks up any chord elements in the sequence into ascending arpeggios with the given rhythmic subdivision
+    fun void arpeggiate(float resolution)
+    {
+        
+    }
+
+    // arpeggiates chord elements in the sequence, using the given rhythmic value, in the specified direction 
+    // (0 = ascending, 1 = descending, 2 = random order)
+    fun void arpeggiate(float resolution, int direction)
+    {
+        
+    }
+
+    // add a voice at a given semitone interval above/below all elements in the sequence
+    fun void harmonize(int interval)
+    {
+        1 +=> n_voices;
+        for(int i; i < pitches.size(); i++)
+        {
+            //<<<pitches[i][pitches[i].size()-1]>>>;
+            pitches[i] << pitches[i][pitches[i].size()-1] + interval;
+        }
+    }
+
+    // add a voice at a given number of diatonic steps according to a given scale
+    //fun void harmonize(int interval, int[] scale)
+    //{
+    //    
+    //}
+
+    // insert a new sequence at index 0
+    fun void insert(EZscore seq)
+    {
+        seq.pitches @=> int seqPitches[][];
+        seq.rhythms @=> float seqDurations[];
+
+        int tempP[0][0];
+        for(int i; i < seqPitches.size(); i++)
+        {
+            tempP << seqPitches[i];
+        }
+        for(int j; j < pitches.size(); j++)
+        {
+            tempP << pitches[j];
+        }
+
+        float tempD[0];
+        for(int i; i < seqDurations.size(); i++)
+        {
+            tempD << seqDurations[i];
+        }
+        for(int j; j < rhythms.size(); j++)
+        {
+            tempD << rhythms[j];
+        }
+
+        tempP @=> pitches;
+        tempD @=> rhythms;
+    }
+
+    // insert a new sequence at a given index
+    fun void insert(EZscore seq, int index)
+    {
+        seq.pitches @=> int seqPitches[][];
+        seq.rhythms @=> float seqDurations[];
+
+        int tempP[0][0];
+        for(int j; j < index; j++)
+        {
+            tempP << pitches[j];
+        }
+        for(int i; i < seqPitches.size(); i++)
+        {
+            tempP << seqPitches[i];
+        }
+        for(index => int j; j < pitches.size(); j++)
+        {
+            tempP << pitches[j];
+        }
+
+        float tempD[0];
+        for(int j; j < index; j++)
+        {
+            tempD << rhythms[j];
+        }
+        for(int i; i < seqDurations.size(); i++)
+        {
+            tempD << seqDurations[i];
+        }
+        for(int j; j < rhythms.size(); j++)
+        {
+            tempD << rhythms[j];
+        }
+
+        tempP @=> pitches;
+        tempD @=> rhythms; 
+    }
+
+    // inverts the intervals between successive pitches (chromatic)
+    fun void invert()
+    {
+        
+    }
+
+    // inverts the intervals between successive pitches, according to a given scale
+    //fun void invert(EZscale scale)
+    //{
+    //   
+    //}
+
+    // repeat the sequence a given number of times
+    //fun void repeat(int times)
+    //{
+
+    //}
+
+    // reverse the order of pitches and rhythms in the sequence
+    fun void reverse()
+    {
+        pitches.reverse();
+        rhythms.reverse();
+    }
+
+    // reverse the order of either pitches only (layers = 0) and rhythms only (layers = 1),
+    // or both (layers = 2)
+    fun void reverse(int layers)
+    {
+        if(layers == 0)
+        {
+            pitches.reverse();
+        }
+        if(layers == 1)
+        {
+            rhythms.reverse();
+        }
+        if(layers == 2)
+        {
+            pitches.reverse();
+            rhythms.reverse();
+        }
+        
+    }
+
+    // remove elements from the end of the sequence
+    fun void shorten(int length)
+    {
+        pitches.erase(pitches.size()-length, pitches.size());
+        rhythms.erase(rhythms.size()-length, rhythms.size());
+    }
+
+    // randomize the order of pitches and rhythms in the sequence
+    fun void shuffle()
+    {
+        pitches.shuffle();
+        rhythms.shuffle();
+    }
+
+    // randomize the order of either pitches only (layers = 0), rhythms only (layers = 1),
+    // or both (layers = 2)
+    fun void shuffle(int layers)
+    {
+        if(layers == 0)
+        {
+            pitches.shuffle();
+        }
+        if(layers == 1)
+        {
+            rhythms.shuffle();
+        }
+        if(layers == 2)
+        {
+            pitches.shuffle();
+            rhythms.shuffle();
+        }
+    }
+
+    // divides each note into multiple notes, proportionally dividing the duration
+    fun void stutter(int times)
+    {
+
+    }
+
+    // multiply the rhythmic values in the sequence by the given value 
+    // (e.g. passing .5 results in double-time, passing 2 results in half-time)
+    fun void subdivide(float subdivision)
+    {
+
+    }
+
+    // transpose the sequence by a number of semitones
+    fun void transpose(int amount)
+    {
+        for(int i; i < pitches.size(); i++)
+        {
+            for(int j; j < pitches[i].size(); j++)
+            {
+                amount +=> pitches[i][j];
+            }
+        }
+    }
+
+    // transpose the sequence by a number of semitones, starting at a given index
+    fun void transpose(int amount, int start)
+    {
+        for(start => int i; i < pitches.size(); i++)
+        {
+            for(int j; j < pitches[i].size(); j++)
+            {
+                amount +=> pitches[i][j];
+            }
+        }
+    }
+
+    // transpose a certain number of notes starting at a given index
+    fun void transpose(int amount, int start, int length)
+    {
+        for(start => int i; i < start + length; i++)
+        {
+            for(int j; j < pitches[i].size(); j++)
+            {
+                amount +=> pitches[i][j];
+            }
+        }
+    }
+
+    // trim the sequence to be a specified length in quarter notes
+    fun void trim(float length)
+    {
+
+    }
+
 }
 
 

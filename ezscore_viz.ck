@@ -61,7 +61,7 @@ class Part extends GGen
     // melody
     int melSize;
     int notesCount;
-    float durations[];
+    float rhythms[];
     int pitches[][];
     float lowP;
     float hiP;
@@ -83,7 +83,7 @@ class Part extends GGen
     {
         // get data from EZscore melody object
         input_melody @=> mel;
-        mel.durations @=> durations;
+        mel.rhythms @=> rhythms;
         mel.pitches @=> pitches;
         mel.length => melSize;
         mel.countNotes() => notesCount;
@@ -119,7 +119,7 @@ class Part extends GGen
         {
             vec3 chordPositions[0];
             pitches[i] @=> int curr_notes[];
-            durations[i] * dx +=> xPos;
+            rhythms[i] * dx +=> xPos;
             for(int j; j < curr_notes.size(); j++)
             {
                 (curr_notes[j] - lowP) * dy => float yPos;
@@ -202,7 +202,7 @@ class Part extends GGen
         for(int i; i < notesCount; i++)
         {
             pitches[i] @=> int curr_notes[];
-            60*durations[i]/local_bpm => float durTime;
+            60*rhythms[i]/local_bpm => float durTime;
             for(int j; j < curr_notes.size(); j++)
             {
                 curr_notes[j] => int note;

@@ -15,7 +15,8 @@ EZchord chords[tests.size()];
 
 for(int i; i < tests.size(); i++)
 {
-    chords[i].init(tests[i]);
+    //chords[i].init(tests[i]);
+    new EZchord(tests[i]) @=> chords[i];
     chout <= chords[i]._input <= IO.newline();
     for(auto x : chords[i]._notes)
     {
