@@ -17,6 +17,12 @@ public class EZscale
 
     int scaleDict[0][0];
 
+    // major/minor
+    [0, 2, 4, 5, 7, 9, 11] @=> scaleDict["major"];
+    [0, 2, 3, 5, 7, 8, 10] @=> scaleDict["minor"];
+    [0, 2, 3, 5, 7, 9, 11] @=> scaleDict["melodicminor"];
+    [0, 2, 3, 5, 7, 8, 11] @=> scaleDict["harmoniccminor"];
+
     // greek modes
     [0, 2, 4, 5, 7, 9, 11] @=> scaleDict["ionian"];
     [0, 2, 3, 5, 7, 9, 10] @=> scaleDict["dorian"];
@@ -42,7 +48,6 @@ public class EZscale
     // altered modes
     [0, 2, 4, 5, 7, 8, 11] @=> scaleDict["harmonicmajor"];
     [0, 2, 3, 5, 7, 8, 11] @=> scaleDict["harmonicminor"];
-    [0, 2, 3, 5, 7, 9, 11] @=> scaleDict["melodicminor"];
     [0, 1, 4, 5, 7, 8, 10] @=> scaleDict["phyrgiandominant"];
     [0, 2, 4, 6, 7, 9, 10] @=> scaleDict["lydiandominant"];
     [0, 2, 4, 6, 8, 9, 11] @=> scaleDict["lydianaugmented"];
@@ -149,32 +154,3 @@ public class EZscale
         return ans;
     }
 }
-
-// int scaleDict[0][0];
-// [0, 2, 4, 5, 7, 9, 11] @=> scaleDict["ionian"];
-// [0, 2, 3, 5, 7, 9, 10] @=> scaleDict["dorian"];
-// [0, 1, 3, 5, 7, 8, 10] @=> scaleDict["phyrgian"];
-// [0, 2, 4, 6, 7, 9, 11] @=> scaleDict["lydian"];
-// [0, 2, 4, 5, 7, 9, 10] @=> scaleDict["mixolydian"];
-// [0, 2, 3, 5, 7, 8, 10] @=> scaleDict["aeolian"];
-// [0, 1, 3, 5, 6, 8, 10] @=> scaleDict["locrian"];
-
-
-// [0, 2, 4, 5, 7, 9, 11] @=> int testArr[];
-// testArr.typeOf() @=> Type t;
-// cherr <= "testArr is an: " <= t.name() <= IO.newline() <= "is an array: " <= t.isArray() <= IO.newline();
-
-
-// scaleDict["ionian"].typeOf() @=> t;
-// cherr <= "scaleDict['ionian'] is an: " <= t.name() <= IO.newline() <= "is an array: " <= t.isArray() <= IO.newline();
-
-EZscale scale("minhexatonic", "C5");
-
-//scale.lookup("minhexatonic") @=> int test[];
-
-// for(auto x : scale.notes)
-// {
-//     <<<x>>>;
-// }
-
-<<<scale.degree(87)>>>;

@@ -13,13 +13,13 @@
 // this would correspond to notes Gb Bb Db F Ab C
 //
 // Member variables:
-// _notes (int[]) : MIDI note values for chord tones
-// _root (int) : the root note, as MIDI note
-// _rootName (str) : name of the root note, e.g. F, Ab, D##
-// _triad (int[]) : MIDI note values for the triad component of the chord
-// _triadType (str) : the triad type, e.g. "maj", "min", "dim"
-// _extension (int[]) : the MIDI note values for the extended (upper) chord tones from the 7th and above
-// _suffix (str) : the description of the extension type
+// notes (int[]) : MIDI note values for chord tones
+// root (int) : the root note, as MIDI note
+// rootName (str) : name of the root note, e.g. F, Ab, D##
+// triad (int[]) : MIDI note values for the triad component of the chord
+// triadType (str) : the triad type, e.g. "maj", "min", "dim"
+// extension (int[]) : the MIDI note values for the extended (upper) chord tones from the 7th and above
+// suffix (str) : the description of the extension type
 //
 //
 // usage notes:
@@ -64,29 +64,33 @@ public class EZchord
     10 => seventh_dict["sus"];
 
     // initialization
-    string _input;
+    string input;
 
     // member variables
-    int _notes[];
-    int _root;
-    string _rootName;
-    int _triad[];
-    string _triadType;
-    int _extension[];
-    string _suffix;
+    int notes[];
+    int root;
+    string rootName;
+    int triad[];
+    string triadType;
+    int extension[];
+    string suffix;
 
     fun EZchord(string in)
     {
-        in => _input;
-        setRoot();
-        setTriad();
-        setExtension();
-        setNotes();        
+        init(in);  
     }
 
+    fun EZchord(string in, int octave)
+    {
+        init(in);
+        for(int i; i < notes.size(); i++)
+        {
+            (octave + 1) * 12 +=> notes[i];
+        }
+    }
     fun void init(string in)
     {
-        in => _input;
+        in => input;
         setRoot();
         setTriad();
         setExtension();
@@ -96,35 +100,35 @@ public class EZchord
     fun void setRoot()
     {
 
-        _input => string input;
+        input => string raw;
 
-        int root;
+        int root_temp;
         int alter;
 
-        input.substring(0,1) => string first;
+        raw.substring(0,1) => string first;
         if(pitch_dict.isInMap(first))
         {
-            pitch_dict[first] => root;
-            first => _rootName;
+            pitch_dict[first] => root_temp;
+            first => rootName;
         }
         else
         {
             <<<"Invalid root note (did you forget uppercase?)">>>;
-            -999 => root;
+            -999 => root_temp;
         }
-        input.erase(0, 1);
-        if(input.length() > 0)
+        raw.erase(0, 1);
+        if(raw.length() > 0)
         {
-            input.substring(0,1) => string first;
+            raw.substring(0,1) => string first;
 
             if(alter_dict.isInMap(first))
             {
                 alter_dict[first] + alter => alter;
-                input.erase(0,1);
-                if(alter_dict.isInMap(input.substring(0,1)))
+                raw.erase(0,1);
+                if(alter_dict.isInMap(raw.substring(0,1)))
                 {
                     alter_dict[first] + alter => alter;
-                    input.erase(0,1);
+                    raw.erase(0,1);
                 }
             }
         }
@@ -132,76 +136,76 @@ public class EZchord
         {
             for (int i; i < alter; i++)
             {
-                "#" +=> _rootName;
+                "#" +=> rootName;
             }
         }
         if (alter < 0)
         {
             for (int i; i < alter*-1; i++)
             {
-                "b" +=> _rootName;
+                "b" +=> rootName;
             }   
         }
-        root + alter => _root;
+        root_temp + alter => root;
     }
 
     fun void setTriad()
     {
-        _input => string input;
-        _rootName.length() => int prefix;
-        if(_input.length() <= prefix) // i.e. there is nothing after the root characters
+        input => string raw;
+        rootName.length() => int prefix;
+        if(input.length() <= prefix) // i.e. there is nothing after the root characters
         {
-            "maj" => _triadType;
-            "" => _suffix;
+            "maj" => triadType;
+            "" => suffix;
         }
         else
         {
-            input.substring(prefix) => input; // trimming the root characters from front
-            if(input.length() >= 3)
+            raw.substring(prefix) => raw; // trimming the root characters from front
+            if(raw.length() >= 3)
             {
-                input.substring(0,3) => string front;
+                raw.substring(0,3) => string front;
                 if(triad_dict.isInMap(front)) // the first 3 characters match "maj", "min", "dom" etc.
                 {
-                    front => _triadType;
-                    if(input.length() > 3)
+                    front => triadType;
+                    if(raw.length() > 3)
                     {
-                        input.substring(3) => _suffix; // suffix becomes everything after the root + 3 characters
+                        raw.substring(3) => suffix; // suffix becomes everything after the root + 3 characters
                     }
                     else
                     {
-                        "" => _suffix;
+                        "" => suffix;
                     }
                 }
                 else // i.e. extended dom. seventh chords
                 {
-                    input => _suffix;
-                    if(Std.atoi(input.substring(0,1)) != -1) // the first character is some integer
+                    raw => suffix;
+                    if(Std.atoi(raw.substring(0,1)) != -1) // the first character is some integer
                     {
-                        "dom" => _triadType;
+                        "dom" => triadType;
                     }
                     else // something is strange, default to major
                     {
-                        "maj" => _triadType;
+                        "maj" => triadType;
                     }
                 }
             }
-            if(input.length() > 0 && input.length() < 3) // i.e. extended dom. seventh chords
+            if(raw.length() > 0 && raw.length() < 3) // i.e. extended dom. seventh chords
             {
-                input => _suffix; // suffix becomes everything after root 
-                if(Std.atoi(input.substring(0,1)) != -1) // first character is some integer
+                raw => suffix; // suffix becomes everything after root 
+                if(Std.atoi(raw.substring(0,1)) != -1) // first character is some integer
                 {
-                    "dom" => _triadType;
+                    "dom" => triadType;
                 }
                 else // something is strange, default to major
                 {
-                    "maj" => _triadType;
+                    "maj" => triadType;
                 }
             }
         }
         // set integer notes indicating kind of triad
-        if(triad_dict.isInMap(_triadType))
+        if(triad_dict.isInMap(triadType))
         {
-            triad_dict[_triadType] @=> _triad;
+            triad_dict[triadType] @=> triad;
         }
     }
 
@@ -209,7 +213,7 @@ public class EZchord
     {
         int ans[0];
         0 => int alter;
-        _suffix => string input;
+        suffix => string input;
         while(input.length() > 0)
         {
             input.substring(0,1) => string first;
@@ -233,7 +237,7 @@ public class EZchord
             // 7th added depending on triad type
             if(first == "7")
             {
-                ans << seventh_dict[_triadType];
+                ans << seventh_dict[triadType];
                 input.erase(0,1);
             }
             // 9th added; if no 7th was specified, adds implicit 7th based on triad
@@ -241,7 +245,7 @@ public class EZchord
             {
                 if(ans.size() == 0)
                 {
-                    ans << seventh_dict[_triadType];
+                    ans << seventh_dict[triadType];
                 }
                 ans << 14 + alter;
                 input.erase(0,1);
@@ -251,7 +255,7 @@ public class EZchord
             {
                 if(ans.size() == 0)
                 {
-                    ans << seventh_dict[_triadType];
+                    ans << seventh_dict[triadType];
                     ans << 14;
                 }
                 ans << 17 + alter;
@@ -263,27 +267,27 @@ public class EZchord
                 //<<<"adding 13th">>>;
                 if(ans.size() == 0 && input.length() == 2)
                 {
-                    ans << seventh_dict[_triadType];
+                    ans << seventh_dict[triadType];
                     ans << 14;
                 }
                 ans << 21 + alter;
                 input.erase(0,2);
             }
         }
-        ans @=> _extension;
+        ans @=> extension;
     }
     fun void setNotes()
     {
         int temp[0];
-        for (int i; i < _triad.size(); i++)
+        for (int i; i < triad.size(); i++)
         {
-            temp << _root + _triad[i];
+            temp << root + triad[i];
         }
-        if(_extension.size() > 0)
+        if(extension.size() > 0)
         {
-            for (int j; j < _extension.size(); j++)
+            for (int j; j < extension.size(); j++)
             {
-                temp << _root + _extension[j];
+                temp << root + extension[j];
             }
         }
 
@@ -295,7 +299,7 @@ public class EZchord
         }
         else
         {
-            ans << _root;
+            ans << root;
         }
         for(1 => int k; k < temp.size(); k++)
         {
@@ -304,7 +308,29 @@ public class EZchord
                 ans << temp[k];
             }
         }
-        ans @=> _notes;
+        ans @=> notes;
+    }
+
+    fun void inversion(int val)
+    {
+        for(int i; i < val; i++)
+        {
+            12 +=> notes[i];
+        }
+        notes.sort();
+    }
+
+    fun int[][] arpeggiate()
+    {
+        int ans[0][0];
+        notes @=> int notes[];
+        
+        for(int i; i < notes.size(); i++)
+        {
+            ans << [notes[i]];
+        }
+
+        return ans;
     }
 
 }

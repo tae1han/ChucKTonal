@@ -16,9 +16,9 @@ EZchord chords[tests.size()];
 for(int i; i < tests.size(); i++)
 {
     //chords[i].init(tests[i]);
-    new EZchord(tests[i]) @=> chords[i];
-    chout <= chords[i]._input <= IO.newline();
-    for(auto x : chords[i]._notes)
+    new EZchord(tests[i], 3) @=> chords[i];
+    chout <= chords[i].input <= IO.newline();
+    for(auto x : chords[i].notes)
     {
         chout <= x <= " ";
     }
@@ -33,11 +33,11 @@ for(int i; i < tests.size(); i++)
 {
     <<<"test ", i, "(", tests[i],"): ">>>;
     <<<"----------------------------">>>;
-    chords[i]._notes @=> int ans[];
+    chords[i].notes @=> int ans[];
     for(auto x : ans)
     {
         <<<x>>>;
-        Std.mtof(48 + x) => r.freq;
+        Std.mtof(x) => r.freq;
         .5 => r.noteOn;
         100::ms => now;
     }
