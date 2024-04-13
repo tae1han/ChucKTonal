@@ -116,18 +116,18 @@ class ScorePlayer
 EZscore part1(part1mel, part1rhy);
 // part1.setPitch(part1mel);
 // part1.setRhythm(part1rhy);
-//part1.shuffle();
+part1.shuffle(2);
 part1.printPitchRhythm();
 
 EZscore part2(part2mel, part2rhy);
 // part2.setPitch(part2mel);
 // part2.setRhythm(part2rhy);
-//part2.shuffle();
+part2.shuffle(2);
 
 EZscore part3(part3mel, part3rhy);
 // part3.setPitch(part3mel);
 // part3.setRhythm(part3rhy);
-//part3.shuffle();
+part3.shuffle(2);
 // EZscore array to contain all parts
 
 EZscore fullScore[];
