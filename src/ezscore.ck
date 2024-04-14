@@ -942,7 +942,7 @@ public class EZscore
         }        
     }
 
-    // insert a new sequence at index 0
+    // insert a new sequence ('seq') at index 0
     fun void insert(EZscore seq)
     {
         seq.pitches @=> int seqPitches[][];
@@ -972,7 +972,7 @@ public class EZscore
         tempD @=> rhythms;
     }
 
-    // insert a new sequence at a given index
+    // insert a new sequence ('seq') at a given index ('index')
     fun void insert(EZscore seq, int index)
     {
         seq.pitches @=> int seqPitches[][];
@@ -1035,8 +1035,8 @@ public class EZscore
         rhythms.reverse();
     }
 
-    // reverse the order of either pitches only (layers = 0) and rhythms only (layers = 1),
-    // or both (layers = 2)
+    // reverse the order of either pitches only ('layers' = 0) and rhythms only ('layers' = 1),
+    // or both ('layers' = 2)
     fun void reverse(int layers)
     {
         if(layers == 0)
@@ -1055,7 +1055,7 @@ public class EZscore
         
     }
 
-    // remove elements from the end of the sequence
+    // remove a number of elements (n = 'length') from the end of the sequence
     fun void shorten(int length)
     {
         pitches.erase(pitches.size()-length, pitches.size());
@@ -1069,8 +1069,8 @@ public class EZscore
         rhythms.shuffle();
     }
 
-    // randomize the order of either pitches only (layers = 0), rhythms only (layers = 1),
-    // or both (layers = 2)
+    // randomize the order of either pitches only ('layers' = 0), rhythms only ('layers' = 1),
+    // or both ('layers' = 2)
     fun void shuffle(int layers)
     {
         if(layers == 0)
@@ -1090,7 +1090,7 @@ public class EZscore
 
 
 
-    // multiply the rhythmic values in the sequence by the given value 
+    // multiply the rhythmic values in the sequence by the given value ('multiplier')
     // (e.g. passing .5 results in double-time, passing 2 results in half-time)
     fun void speed(float multiplier)
     {
@@ -1101,7 +1101,27 @@ public class EZscore
         multiplier /=> totalDuration;
     }
 
-    // divides each note into multiple notes, proportionally dividing the duration
+    // divides each note into multiple notes (n = 'times'), proportionally dividing the duration
+    fun void subdivide(int times)
+    {
+        int tempPitches[0][0];
+        float tempRhythms[0];
+
+        for(int i; i < length; i++)
+        {
+            for(int j; j < times; j++)
+            {
+                tempPitches << pitches[i];
+                tempRhythms << (rhythms[i] / times);
+            }
+        }
+
+        tempPitches @=> pitches;
+        tempRhythms @=> rhythms;
+        pitches.size() => length;
+    }
+
+    // divides each note into multiple notes (n = 'times'), proportionally dividing the duration. Only applies to notes with given rhythmic duration ('targetRhythm')
     fun void subdivide(int times, float targetRhythm)
     {
         int tempPitches[0][0];
@@ -1131,7 +1151,7 @@ public class EZscore
         pitches.size() => length;
     }
 
-    // blows holes in the melody, turning notes into rests with a certain probability
+    // blows holes in the melody, turning notes into rests with a certain probability ('probability')
     fun void swisscheese(float probability)
     {
         for(int i; i < length; i++)
@@ -1145,7 +1165,7 @@ public class EZscore
         }
     }
 
-    // transpose the sequence by a number of semitones
+    // transpose the sequence by a number of semitones ('amount')
     fun void transpose(int amount)
     {
         for(int i; i < pitches.size(); i++)
@@ -1157,7 +1177,7 @@ public class EZscore
         }
     }
 
-    // transpose the sequence by a number of semitones, starting at a given index
+    // transpose the sequence by a number of semitones ('amount'), starting at a given index ('start')
     fun void transpose(int amount, int start)
     {
         for(start => int i; i < pitches.size(); i++)
@@ -1169,7 +1189,7 @@ public class EZscore
         }
     }
 
-    // transpose a certain number of notes starting at a given index
+    // transpose a certain number of notes ('length') starting at a given index ('start') by a number of semitones ('amount')
     fun void transpose(int amount, int start, int length)
     {
         for(start => int i; i < start + length; i++)
@@ -1181,12 +1201,24 @@ public class EZscore
         }
     }
 
-    // trim the sequence to be a specified length in quarter notes
-    fun void trim(float length)
+    // trim the sequence to be a specified length in beats ('length') 
+    fun void trim(float newBeatLength)
     {
+        int tempPitches[0][0];
+        float tempRhythms[0];
+        0 => float sum;
 
+        while(sum < newBeatLength)
+        {
+            tempPitches << pitches[i];
+            tempRhythms << rhythms[i];
+            rhythms[i] +=> sum;
+        }
+
+        tempPitches @=> pitches;
+        tempRhythms @=> rhythms;
+        rhythms.size() => length;
+        newBeatLength @=> totalDuration;
     }
-
-
 
 }
