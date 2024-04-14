@@ -25,6 +25,9 @@ public class EZscore
     //---------------------------------------------------------------------
     fun string clean_input(string input)
     {
+        input.replace(" // ", " ");
+        input.replace("// ", " ");
+        input.replace(" //", " ");
         input.replace("//", " ");
         input.find("[") => int braceL;
         input.substring(braceL + 1) => string raw;
@@ -562,7 +565,7 @@ public class EZscore
     // Return the lowest pitch in the sequence
     fun int getLowestNote()
     {
-        INT_MAX => int lowest;
+        Math.INT_MAX => int lowest;
 
         for (int i; i < pitches.size(); i++)
         {
@@ -583,7 +586,7 @@ public class EZscore
     // Return the highest pitch in the sequence
     fun int getHighestNote()
     {
-        -1 * INT_MAX => int highest;
+        -1 * Math.INT_MAX => int highest;
 
         for (int i; i < pitches.size(); i++)
         {
@@ -874,17 +877,37 @@ public class EZscore
         1 => n_voices;
     }
 
+    // // duplicate the contents of the sequence a given number of times ('times')
+    // fun void duplicate(int times)
+    // {
+    //     int tempPitches[0][0];
+    //     float tempRhythms[0];
+
+    //     repeat(times)
+    //     {
+    //         for(int i; i < length; i++)
+    //         {
+    //             tempPitches << pitches[i];
+    //             tempRhythms << rhythms[i];
+    //         }
+    //     }
+    //     tempPitches @=> pitches;
+    //     tempRhythms @=> rhythms;
+    //     pitches.size() => length;
+    //     times *=> totalDuration;
+    // }
+
     // add a voice at a constant semitone interval ('interval') above/below the topmost note at each position in the sequence
     fun void harmonize(int interval)
     {
-        1 +=> n_voices;
-        for(int i; i < pitches.size(); i++)
+        for(int i; i < length; i++)
         {
             pitches[i].sort();
             pitches[i][pitches[i].size()-1] => int topnote;
             //<<<pitches[i][pitches[i].size()-1]>>>;
             pitches[i] << topnote + interval;
         }
+        1 +=> n_voices;
     }
 
     // add a voice at a diatonic interval ('interval') above/below the topmost note at each position in the sequence, according to a given scale ('scale')
@@ -1022,12 +1045,6 @@ public class EZscore
     //   
     //}
 
-    // repeat the sequence a given number of times
-    //fun void repeat(int times)
-    //{
-
-    //}
-
     // reverse the order of pitches and rhythms in the sequence
     fun void reverse()
     {
@@ -1087,8 +1104,6 @@ public class EZscore
             rhythms.shuffle();
         }
     }
-
-
 
     // multiply the rhythmic values in the sequence by the given value ('multiplier')
     // (e.g. passing .5 results in double-time, passing 2 results in half-time)
@@ -1208,11 +1223,14 @@ public class EZscore
         float tempRhythms[0];
         0 => float sum;
 
-        while(sum < newBeatLength)
+        for(int i; i < length; i++)
         {
-            tempPitches << pitches[i];
-            tempRhythms << rhythms[i];
-            rhythms[i] +=> sum;
+            if(sum < newBeatLength)
+            {
+                tempPitches << pitches[i];
+                tempRhythms << rhythms[i];
+                rhythms[i] +=> sum;
+            }
         }
 
         tempPitches @=> pitches;

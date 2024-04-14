@@ -5,54 +5,42 @@
 // Alex Han 2024
 ///////////////////////////////////////////////////////////////////////
 
+// Initializing a melody
 //---------------------------------------------------------------------
-// Combining EZscore, EZchord
-//---------------------------------------------------------------------
 
-// Initializing a melody using chords
-//---------------------------------------------------------------------
-// four-chord progression
-EZchord chord1("Abmaj9", 3);
-EZchord chord2("G7#9b13", 3);
-EZchord chord3("Cmin11", 3);
-EZchord chord4("Ebsus9", 3);
-chord4.inversion(2);
-
-EZscore melody([chord1.notes, chord2.notes, chord3.notes, chord4.notes]);
-melody.speed(.5);
-
-// Arpeggiator
-melody.arpeggiate(.25, 4.0, 2);
-
+EZscore melody("[k0 c d e f g a b c]", "[qx2 e. s tex3 q]");
+EZscale scale("major", "C");
 //---------------------------------------------------------------------
 // Playback setup
 //---------------------------------------------------------------------
 
-110 => int bpm;
+120 => int bpm;
 ScorePlayer player(melody, bpm, .1);
-
-// play the melody as-is
 player.play();
 
 //---------------------------------------------------------------------
 // Modulations and variations
 //---------------------------------------------------------------------
 
-repeat(4)
+
+repeat(3)
 {
-    player.play();
+    melody.harmonize(2, scale.notes);
     melody.shuffle(1);
     melody.transpose(3);
     melody.reverse();
-    melody.shorten(2);
+    player.init(melody);
     player.play();
+
     melody.reverse();
-    
     melody.shuffle(2);
     melody.transpose(-2);
     player.play();
+
+    melody.arpeggiate(.25);
     melody.swisscheese(.25);
-    melody.shorten(2);
     melody.transpose(-1);
+    player.init(melody);
+    player.play();
 }
 

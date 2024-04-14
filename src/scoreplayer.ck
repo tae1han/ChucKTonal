@@ -7,7 +7,11 @@ public class ScorePlayer
     int n_voices;
     SinOsc oscs[];
     ADSR envs[];
+    Dyno lim;
+    lim.limit();
     Gain bus;
+    lim => bus => dac;
+
     .1 => float mix;
     120 => float local_bpm;
 
@@ -53,18 +57,14 @@ public class ScorePlayer
         SinOsc temp_oscs[n_voices] @=> oscs;
         ADSR temp_envs[n_voices] @=> envs;
         bus.gain(mix);
+
         for (int i; i < n_voices; i++)
         {
-            oscs[i] => envs[i] => bus => dac;
-            oscs[i].gain(.5/(n_voices $ float));
+            oscs[i] => envs[i] => lim;
+            
+            oscs[i].gain(1.0/(n_voices $ float));
             envs[i].set(10::ms, 500::ms, 0.0, 50::ms);
         }
-    }
-
-    fun void level(float m)
-    {
-        m => mix;
-        init_sound();
     }
     
     fun void playNote(int which, int note, float duration)
