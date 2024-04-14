@@ -70,20 +70,20 @@ ScorePlayer part2(bassline, bpm, .1);
 ScorePlayer part3(chords, bpm, .05);
 ScorePlayer part4(topline, bpm, .25);
 
-repeat(1)
-{
-    spork~part1.play();
-    spork~part2.play();
-    (topline.totalDuration / bpm)::minute => now;
-}
-repeat(2)
-{
-    spork~part1.play();
-    spork~part2.play();
-    spork~part3.play();
-    spork~part4.play();
-    (topline.totalDuration / bpm)::minute => now;
-}
+// repeat(1)
+// {
+//     spork~part1.play();
+//     spork~part2.play();
+//     (topline.totalDuration / bpm)::minute => now;
+// }
+// repeat(2)
+// {
+//     spork~part1.play();
+//     spork~part2.play();
+//     spork~part3.play();
+//     spork~part4.play();
+//     (topline.totalDuration / bpm)::minute => now;
+// }
 
 //---------------------------------------------------------------------
 // Let's mess with the sequences we wrote:

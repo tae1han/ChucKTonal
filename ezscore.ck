@@ -1212,8 +1212,9 @@ public class EZscore
     {
         for(int i; i < length; i++)
         {
-            Math.randomize();
-            if(Math.randomf() <= probability)
+            //Math.randomize();
+            Math.randomf() => float val;
+            if(val <= probability)
             {
                 [-999] @=> pitches[i];
             }
