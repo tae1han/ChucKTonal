@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////
-// EZ score example
+// EZ score example - sequence modulation
 // 
 // NOTE: requires ezscore.ck ezchord.ck scoreplayer.ck
 // Alex Han 2024
@@ -10,6 +10,7 @@
 
 EZscore melody("[k0 c d e f g a b c]", "[qx2 e. s tex3 q]");
 EZscale scale("major", "C");
+
 //---------------------------------------------------------------------
 // Playback setup
 //---------------------------------------------------------------------
