@@ -22,7 +22,6 @@ player.play();
 // Modulations and variations
 //---------------------------------------------------------------------
 
-
 repeat(3)
 {
     melody.harmonize(2, scale.notes);
