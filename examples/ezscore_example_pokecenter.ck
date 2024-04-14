@@ -119,7 +119,7 @@ EZscore part1(part1mel, part1rhy);
 // part1.setPitch(part1mel);
 // part1.setRhythm(part1rhy);
 part1.shuffle(2);
-part1.printPitchRhythm();
+part1.printContents();
 
 EZscore part2(part2mel, part2rhy);
 // part2.setPitch(part2mel);

@@ -48,15 +48,15 @@ EZscore melody;
 melody.setPitch(pitches);
 melody.setRhythm(rhythms);
 
-// To check the contents of the melody, call .printPitchRhythm()
-melody.printPitchRhythm();
+// To check the contents of the melody, call .printContents()
+melody.printContents();
 // Use .printPitches() to check just the MIDI note numbers
 melody.printPitches();
 // Use .printRhythms() to check just the note rhythms in beats
 melody.printRhythms();
 
 // For the subsequent examples, try reassigning the pitch/rhythm sequence
-// using melody.setPitch() or melody.setRhythm(), then calling melody.printPitchRhythm
+// using melody.setPitch() or melody.setRhythm(), then calling melody.printContents
 // to see the effect!
 
 ///////////////////////////////////////////////////////////////////////

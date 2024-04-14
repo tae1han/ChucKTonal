@@ -21,7 +21,7 @@ public class EZscore
     float rhythms[];
 
     //---------------------------------------------------------------------
-    // helper functions
+    // private functions
     //---------------------------------------------------------------------
     fun string clean_input(string input)
     {
@@ -391,7 +391,7 @@ public class EZscore
     // Constructors
     //---------------------------------------------------------------------
 
-    // Construct with only pitches. Autofills rhythms as quarter notes
+    // Constructor using an EZscore-formatted string ('pitchStr'). Rhythms autofilled as quarter notes
     fun EZscore(string pitchStr)
     {
         setPitch(pitchStr);
@@ -404,7 +404,7 @@ public class EZscore
         length => totalDuration;
     }
 
-    // Construct with only pitches, set directly as MIDI notes. Autofills rhythms as quarter notes
+    // Constructor using a 2D array of MIDI note numbers ('p'). Rhythms autofilled as quarter notes
     fun EZscore(int p[][])
     {
         p @=> pitches;
@@ -426,20 +426,21 @@ public class EZscore
         length => totalDuration;
     }
 
-    // Construct with EZscore notation for pitches and rhythms
+    // Constructor using EZscore notation for pitches ('pitchStr') and rhythms ('rhythmStr')
     fun EZscore(string pitchStr, string rhythmStr)
     {
         setPitch(pitchStr);
         setRhythm(rhythmStr);
     }
-    // Construct with EZscore notation for pitches and rhythms, using array of sequences to be appended in order
+
+    // Constructor initialized with an array of EZscore-formatted strings for pitches ('pitchStr') and rhythms ('rhythmStr')
     fun EZscore(string pitchStr[], string rhythmStr[])
     {
         setPitch(pitchStr);
         setRhythm(rhythmStr);
     }
 
-    // set pitches and rhythms directly as MIDI notes, beat values (respectively)
+    // set pitches and rhythms directly as an array of MIDI notes ('p'), beat values ('r')
     fun EZscore(int p[][], float r[])
     {
         p @=> pitches;
@@ -461,7 +462,7 @@ public class EZscore
         sum => totalDuration;
     }
 
-    // set pitches directly as MIDI notes, set rhythms as string representing beat values
+    // set pitches directly as MIDI notes ('p'), set rhythms as string ('rhythmStr') representing beat values
     fun EZscore(int p[][], string rhythmStr)
     {
         p @=> pitches;
@@ -475,54 +476,19 @@ public class EZscore
         }
         setRhythm(rhythmStr);
     }
-    // set pitches and rhythms directly as MIDI notes, beat values (respectively), using arrays
-    // fun EZscore(int p[][][], float r[][])
-    // {
-    //     int tempPitches[0][0];
-    //     for(int i; i < p.size(); i++)
-    //     {
-    //         for(int j; j < p[i].size(); j++)
-    //         {
-    //             tempPitches << p[i][j];
-    //         }
-    //     }
-    //     tempPitches @=> pitches;
-
-    //     float tempRhythms[0];
-    //     for(int i; i < r.size(); i++)
-    //     {
-    //         for(int j; j < r[i].size(); j++)
-    //         {
-    //             tempRhythms << r[i][j];
-    //         }
-    //     }
-    //     tempRhythms @=> rhythms;
-        
-    //     pitches.size() => length;
-    //     for(int i; i < length; i++)
-    //     {
-    //         if(pitches[i].size() > n_voices)
-    //         {
-    //             pitches[i].size() => n_voices;
-    //         }
-    //     }
-
-    //     0 => float sum;
-    //     for(auto i : rhythms)
-    //     {
-    //         i +=> sum;
-    //     }
-    //     sum => totalDuration;
-    // }
+    
     //---------------------------------------------------------------------
     // Basics
     //---------------------------------------------------------------------
+    
+    // Set the pitches using EZscore formated string ('input')
     fun void setPitch(string input)
     {
         parse_pitch(input) @=> pitches;
         pitches.size() => length;
     }
 
+    // Set the pitches using an array ('input') of multiple EZscore-formatted strings
     fun void setPitch(string input[])
     {
         int temp[0][0];
@@ -541,6 +507,7 @@ public class EZscore
         pitches.size() => length;
     }
 
+    // Set the rhythms using EZscore-formatted string ('input')
     fun void setRhythm(string input)
     {
         parse_rhythm(input) @=> rhythms;
@@ -553,7 +520,8 @@ public class EZscore
 
         sum => totalDuration;
     }
-    
+
+    // Set the rhythms using an array ('input') of multiple EZscore-formatted strings
     fun void setRhythm(string input[])
     {
         float temp[0];
@@ -579,6 +547,8 @@ public class EZscore
         sum => totalDuration;
     }
 
+    // Get the count of all notes in the object, counting polyphonic voices individually
+    // i.e. a triad counts as 3 notes
     fun int countNotes()
     {
         int count;
@@ -589,9 +559,10 @@ public class EZscore
         return count;
     }
 
+    // Return the lowest pitch in the sequence
     fun int getLowestNote()
     {
-        999 => int lowest;
+        INT_MAX => int lowest;
 
         for (int i; i < pitches.size(); i++)
         {
@@ -609,9 +580,10 @@ public class EZscore
         return lowest;
     }
 
+    // Return the highest pitch in the sequence
     fun int getHighestNote()
     {
-        -999 => int highest;
+        -1 * INT_MAX => int highest;
 
         for (int i; i < pitches.size(); i++)
         {
@@ -628,47 +600,50 @@ public class EZscore
         return highest;
     }
 
+    // Print out the pitch name (string) and MIDI note number (int) of each pitch in the sequence
     fun void printPitches()
     {
-		<<<"# of pitches: ", pitches.size()>>>;
         for (int i; i < pitches.size(); i++)
         {
             pitches[i] @=> int curr[];
+            chout <= "note" <= i <= ": ";
             for(auto p : curr)
             {
-                <<<p>>>;
+                chout <= mid2str(p) <= "(" <= p <= ")" <= IO.newline();
             }
-
         }
     }
 
+    // Print out the beat duration value (float) of each note in the sequence
     fun void printRhythms()
     {   
-		<<<"# of rhythms: ", rhythms.size()>>>;
-        for(auto r : rhythms)
+		//<<<"# of rhythms: ", rhythms.size()>>>;
+        for(int i; i < length; i++)
         {
-            <<<r>>>;
+            chout <= "note" <= i <= ": " <= rhythms[i] <= IO.newline();
         }
     }
 
-	fun void printPitchRhythm()
+    // Print out the pitch name (string), MIDI note number (int), and beat duration (float) of each note in the sequence
+	fun void printContents()
 	{
-		for(int i; i < rhythms.size(); i++)
+		for(int i; i < length; i++)
 		{
             pitches[i] @=> int curr[];
-            chout <= "note: ";
-            for(auto x : curr)
+            chout <= "note" <= i <= ": ";
+            for(auto p : curr)
             {
-                chout <= mid2str(x) <= " ";
+                chout <= mid2str(p) <= "(" <= p <= "), ";
             }
-            chout <= IO.newline() <= "duration: " <= rhythms[i] <= IO.newline();
+            chout <= "duration: " <= rhythms[i] <= IO.newline();
 		}
 	}
+
     //---------------------------------------------------------------------
     // Sequence modulators
     //---------------------------------------------------------------------
 
-    // appends the provided sequence to the current one
+    // appends the provided EZscore sequence ('seq') to the current one
     fun void add(EZscore seq)
     {
         seq.pitches @=> int newPitches[][];
@@ -722,7 +697,7 @@ public class EZscore
         1 => n_voices;
     }
 
-    // breaks up any chord elements in the sequence into ascending arpeggios with the given rhythmic subdivision
+    // breaks up any chord elements in the sequence into ascending arpeggios with the given rhythmic subdivision ('resolution')
     fun void arpeggiate(float resolution)
     {
         int tempPitches[0][0];
@@ -752,7 +727,7 @@ public class EZscore
         1 => n_voices;
     }
 
-    // breaks up any chord elements in the sequence into ascending arpeggios with the given rhythmic value, for a specified length in beats
+    // breaks up any chord elements in the sequence into ascending arpeggios with the given rhythmic value ('resolution'), for a specified length in beats ('arpLength')
     fun void arpeggiate(float resolution, float arpLength)
     {
         int tempPitches[0][0];
@@ -792,9 +767,9 @@ public class EZscore
         1 => n_voices;
     }
 
-    // arpeggiates chord elements in the sequence, using the given rhythmic value, for a specified length, in the specified direction 
+    // arpeggiates chord elements in the sequence, using the given rhythmic value ('resolution'), for a specified length ('arpLength'), in the specified direction ('direction') 
     // (0 = ascending, 1 = descending, 2 = random order)
-    fun void arpeggiate(float resolution, float arpLength, int direction)
+    fun void arpeggiate(float resolution, float arpLength, string direction)
     {
         int tempPitches[0][0];
         float tempRhythms[0];
@@ -809,11 +784,11 @@ public class EZscore
 
             if(chord.size() > 1)
             {
-                if(direction == 1)
+                if(direction == "down")
                 {
                     chord.reverse();
                 }
-                if(direction == 2)
+                if(direction == "rand")
                 {
                     chord.shuffle();               
                 }
@@ -845,9 +820,9 @@ public class EZscore
         1 => n_voices;
     }
 
-    // arpeggiates chord elements in the sequence, using the given rhythmic value, for a specified length, in the specified direction 
+    // arpeggiates chord elements in the sequence, using the given rhythmic value ('resolution'), in the specified direction ('direction') 
     // (0 = ascending, 1 = descending, 2 = random order)
-    fun void arpeggiate(float resolution, int direction)
+    fun void arpeggiate(float resolution, string direction)
     {
         int tempPitches[0][0];
         float tempRhythms[0];
@@ -863,11 +838,11 @@ public class EZscore
 
             if(chord.size() > 1)
             {
-                if(direction == 1)
+                if(direction == "down")
                 {
                     chord.reverse();
                 }
-                if(direction == 2)
+                if(direction == "up")
                 {
                     chord.shuffle();               
                 }
@@ -899,60 +874,7 @@ public class EZscore
         1 => n_voices;
     }
 
-    // // arpeggiates chord elements in the sequence, using the given rhythmic value, in the specified direction 
-    // // (0 = ascending, 1 = descending, 2 = random order)
-    // fun void arpeggiate(float resolution, int direction)
-    // {
-    //     int tempPitches[0][0];
-    //     float tempRhythms[0];
-
-    //     for(int i; i < length; i++)
-    //     {
-    //         if(pitches[i].size() > 1)
-    //         {
-    //             if(direction == 0)
-    //             {
-    //                 for(int j; j < pitches[i].size(); j++)
-    //                 {
-    //                     tempPitches << [pitches[i][j]];
-    //                     tempRhythms << resolution;
-    //                     resolution +=> totalDuration;
-    //                 }
-    //             }
-    //             if(direction == 1)
-    //             {
-    //                 for(pitches[i].size() - 1 => int j; j >= 0; j--)
-    //                 {
-    //                     tempPitches << [pitches[i][j]];
-    //                     tempRhythms << resolution;
-    //                     resolution +=> totalDuration;
-    //                 }
-    //             }
-    //             if(direction == 2)
-    //             {
-    //                 pitches[i].shuffle();
-    //                 for(int j; j < pitches[i].size(); j++)
-    //                 {
-    //                     tempPitches << [pitches[i][j]];
-    //                     tempRhythms << resolution;
-    //                     resolution +=> totalDuration;
-    //                 }                    
-    //             }
-    //         }
-    //         else
-    //         {
-    //             tempPitches << pitches[i];
-    //             tempRhythms << rhythms[i];
-    //         }
-    //     }
-
-    //     tempPitches @=> pitches;
-    //     tempRhythms @=> rhythms;
-    //     pitches.size() => length;
-    //     1 => n_voices;
-    // }
-
-    // add a voice at a given semitone interval above/below all elements in the sequence
+    // add a voice at a constant semitone interval ('interval') above/below the topmost note at each position in the sequence
     fun void harmonize(int interval)
     {
         1 +=> n_voices;
@@ -965,6 +887,7 @@ public class EZscore
         }
     }
 
+    // add a voice at a diatonic interval ('interval') above/below the topmost note at each position in the sequence, according to a given scale ('scale')
     fun void harmonize(int interval, int scale[])
     {
         1 +=> n_voices;
@@ -985,6 +908,7 @@ public class EZscore
         }        
     }
 
+    // add a voice at a diatonic interval ('interval') above/below the topmost note at each position in the sequence, according to a given scale ('scale'), with an octave displacement ('octave')
     fun void harmonize(int interval, int scale[], int octave)
     {
         1 +=> n_voices;
