@@ -34,41 +34,41 @@ public class EZscale
 
     // symmetric
     [0, 2, 4, 6, 8, 10] @=> scaleDict["wholetone"];
-    [0, 3, 4, 7, 8, 11] @=> scaleDict["augmented"];
+    [0, 3, 4, 7, 8, 11] @=> scaleDict["aug"];
     [0, 1, 3, 4, 6, 7, 9, 10] @=> scaleDict["halfwhole"];
     [0, 2, 3, 5, 6, 8, 9, 11] @=> scaleDict["wholehalf"];
 
     // penta/hexa
     [0, 3, 5, 6, 7, 10] @=> scaleDict["blues"];
-    [0, 2, 4, 7, 9] @=> scaleDict["majpentatonic"];
-    [0, 3, 5, 7, 10] @=> scaleDict["minpentatonic"];
-    [0, 2, 4, 7, 9, 11] @=> scaleDict["majhexatonic"];
-    [0, 2, 3, 5, 7, 10] @=> scaleDict["minhexatonic"];
+    [0, 2, 4, 7, 9] @=> scaleDict["maj_pent"];
+    [0, 3, 5, 7, 10] @=> scaleDict["min_pent"];
+    [0, 2, 4, 7, 9, 11] @=> scaleDict["maj_hex"];
+    [0, 2, 3, 5, 7, 10] @=> scaleDict["min_hex"];
 
     // altered modes
-    [0, 2, 4, 5, 7, 8, 11] @=> scaleDict["harmonicmajor"];
-    [0, 2, 3, 5, 7, 8, 11] @=> scaleDict["harmonicminor"];
-    [0, 1, 4, 5, 7, 8, 10] @=> scaleDict["phyrgiandominant"];
-    [0, 2, 4, 6, 7, 9, 10] @=> scaleDict["lydiandominant"];
-    [0, 2, 4, 6, 8, 9, 11] @=> scaleDict["lydianaugmented"];
-    [0, 2, 4, 5, 6, 8, 10] @=> scaleDict["majorlocrian"];
-    [0, 1, 3, 4, 6, 8, 10] @=> scaleDict["supralocrian"];
-    [0, 1, 3, 5, 7, 9, 11] @=> scaleDict["neapolitanmajor"];
-    [0, 1, 3, 5, 7, 8, 11] @=> scaleDict["neapolitanminor"];
-    [0, 2, 3, 5, 6, 8, 10] @=> scaleDict["halfdiminished"];
+    [0, 2, 4, 5, 7, 8, 11] @=> scaleDict["maj_harm"];
+    [0, 2, 3, 5, 7, 8, 11] @=> scaleDict["min_harm"];
+    [0, 1, 4, 5, 7, 8, 10] @=> scaleDict["phry_dom"];
+    [0, 2, 4, 6, 7, 9, 10] @=> scaleDict["lyd_dom"];
+    [0, 2, 4, 6, 8, 9, 11] @=> scaleDict["lyd_aug"];
+    [0, 2, 4, 5, 6, 8, 10] @=> scaleDict["maj_loc"];
+    [0, 1, 3, 4, 6, 8, 10] @=> scaleDict["supraloc"];
+    [0, 1, 3, 5, 7, 9, 11] @=> scaleDict["nea_maj"];
+    [0, 1, 3, 5, 7, 8, 11] @=> scaleDict["nea_min"];
+    [0, 2, 3, 5, 6, 8, 10] @=> scaleDict["half_dim"];
 
     // "exotic"
-    [0, 1, 4, 5, 7, 8, 11] @=> scaleDict["doubleharmonic"];
+    [0, 1, 4, 5, 7, 8, 11] @=> scaleDict["dbl_harm"];
     [0, 1, 4, 6, 8, 10, 11] @=> scaleDict["enigmatic"];
     [0, 2, 3, 6, 7, 8, 10] @=> scaleDict["gypsy"];
-    [0, 2, 3, 6, 7, 8, 11] @=> scaleDict["hungarianminor"];
-    [0, 3, 4, 6, 7, 9, 10] @=> scaleDict["hungarianmajor"];
+    [0, 2, 3, 6, 7, 8, 11] @=> scaleDict["min_hung"];
+    [0, 3, 4, 6, 7, 9, 10] @=> scaleDict["maj_hung"];
     [0, 1, 4, 5, 6, 8, 11] @=> scaleDict["persian"];
     [0, 2, 4, 6, 9, 10] @=> scaleDict["prometheus"];
-    [0, 1, 5, 7, 8] @=> scaleDict["inscale"];
+    [0, 1, 5, 7, 8] @=> scaleDict["in"];
     [0, 1, 5, 7, 10] @=> scaleDict["insen"];
     [0, 1, 5, 6, 10] @=> scaleDict["iwato"];
-    [0, 3, 5, 7, 10] @=> scaleDict["yoscale"];
+    [0, 3, 5, 7, 10] @=> scaleDict["yo"];
 
 
     fun EZscale(string name) 
@@ -139,7 +139,27 @@ public class EZscale
     {
         return scaleDict[name];
     }
-
+    fun int[] lookup(string name, int root)
+    {
+        int ans[];
+        scaleDict[name] @=> ans;
+        for(int i; i < ans.size(); i++)
+        {
+            root +=> ans[i];
+        }
+        return ans;
+    }
+    fun int[] lookup(string name, string rootName)
+    {
+        int ans[];
+        scaleDict[name] @=> ans;
+        parseRoot(rootName) => int root;
+        for(int i; i < ans.size(); i++)
+        {
+            root +=> ans[i];
+        }
+        return ans;
+    }
     fun int degree(int note)
     {
         -1 => int ans;

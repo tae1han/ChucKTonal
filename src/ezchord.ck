@@ -77,18 +77,18 @@ public class EZchord
 
     fun EZchord(string in)
     {
-        init(in);  
+        set(in);  
     }
 
     fun EZchord(string in, int octave)
     {
-        init(in);
+        set(in);
         for(int i; i < notes.size(); i++)
         {
             (octave + 1) * 12 +=> notes[i];
         }
     }
-    fun void init(string in)
+    fun void set(string in)
     {
         in => input;
         setRoot();
@@ -97,6 +97,18 @@ public class EZchord
         setNotes();
     }
 
+    fun void set(string in, int octave)
+    {
+        in => input;
+        setRoot();
+        setTriad();
+        setExtension();
+        setNotes();
+        for(int i; i < notes.size(); i++)
+        {
+            (octave + 1) * 12 +=> notes[i];
+        }
+    }
     fun void setRoot()
     {
 
@@ -311,26 +323,13 @@ public class EZchord
         ans @=> notes;
     }
 
-    fun void inversion(int val)
+    fun void inversion(int n)
     {
-        for(int i; i < val; i++)
+        n % notes.size() => n;
+        for(int i; i < n; i++)
         {
             12 +=> notes[i];
         }
         notes.sort();
     }
-
-    fun int[][] arpeggiate()
-    {
-        int ans[0][0];
-        notes @=> int notes[];
-        
-        for(int i; i < notes.size(); i++)
-        {
-            ans << [notes[i]];
-        }
-
-        return ans;
-    }
-
 }
