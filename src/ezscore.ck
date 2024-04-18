@@ -281,7 +281,7 @@ public class EZscore
                     }
                     curr.erase(0,1);
                     step + alter => pitch;
-                    if(curr.length() == 0 && pitch > 0) // if no more flags after step/alter, check proximity for octave
+                    if(curr.length() == 0 && pitch >= 0) // if no more flags after step/alter, check proximity for octave
                     {
                         if(pitch - last > 6)
                         {
@@ -377,7 +377,7 @@ public class EZscore
         else
         {
             note % 12 => int step;
-            ((note - step) / 12 )=> int octave;
+            ((note - step) / 12 ) - 1 => int octave;
             chromatic[step] => string name;
             name + Std.itoa(octave) => name;
 

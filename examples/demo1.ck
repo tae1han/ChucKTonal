@@ -96,17 +96,17 @@ EZscale scale("major", "G");
 bassline.harmonize(4, scale.notes, 1);
 bassline.harmonize(3, scale.notes);
 // arpeggiate it and drop an octave
-bassline.arpeggiate(1.0, 0);
+bassline.arpeggiate(1.0, "up");
 bassline.transpose(-12);
 part2.init(bassline);
 
 // take the chords part and arpeggiate it
-chords.arpeggiate(1.0/3.0, 6.0, 2);
+chords.arpeggiate(1.0/3.0, 6.0, "rand");
 // turn notes into rests with given probability
 chords.swisscheese(.3);
 part3.init(chords);
 
-repeat(3)
+while(true)
 {
     // play our bassline and arpeggiated chords
     spork~part2.play();
@@ -117,22 +117,22 @@ repeat(3)
     chords.harmonize(5, scale.notes);
     // shuffle the rhythms
     chords.shuffle(1);
-    part2.init(bassline);
-    part3.init(chords);
+    part2.init(bassline, .1);
+    part3.init(chords, .2);
 }
 
-// harmonize the melody
-EZscale penta("majpentatonic", "G");
-topline.transpose(12);
-//topline.harmonize(-2, penta.notes);
-part4.init(topline, .22);
-part3.init(chords, .04);
+// // harmonize the melody
+// EZscale penta("maj_pent", "G");
+// topline.transpose(12);
+// //topline.harmonize(-2, penta.notes);
+// part4.init(topline, .22);
+// // part3.init(chords, .04);
 
-// vamp forever :D
-while(true)
-{
-    spork~part2.play();
-    spork~part3.play();
-    spork~part4.play();
-    (topline.totalDuration / bpm)::minute => now;
-}
+// // vamp forever :D
+// while(true)
+// {
+//     spork~part2.play();
+//     spork~part3.play();
+//     //spork~part4.play();
+//     (topline.totalDuration / bpm)::minute => now;
+// }

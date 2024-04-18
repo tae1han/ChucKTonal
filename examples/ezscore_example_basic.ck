@@ -49,11 +49,11 @@ melody.setPitch(pitches);
 melody.setRhythm(rhythms);
 
 // To check the contents of the melody, call .printContents()
-melody.printContents();
-// Use .printPitches() to check just the MIDI note numbers
-melody.printPitches();
-// Use .printRhythms() to check just the note rhythms in beats
-melody.printRhythms();
+// melody.printContents();
+// // Use .printPitches() to check just the MIDI note numbers
+// melody.printPitches();
+// // Use .printRhythms() to check just the note rhythms in beats
+// melody.printRhythms();
 
 // For the subsequent examples, try reassigning the pitch/rhythm sequence
 // using melody.setPitch() or melody.setRhythm(), then calling melody.printContents
@@ -70,6 +70,8 @@ melody.printRhythms();
 
 // Twinkle twinkle in Db:
 "[df df af af bf bf af]" @=> string pitches_Db;
+// melody.setPitch(pitches_Db);
+// melody.printContents();
 
 // Key signatures
 // -----------------------
@@ -78,13 +80,17 @@ melody.printRhythms();
 // sharps or flats, and X indicates sharps ('s') or flats ('f')
 // In the example below, 'k4f' means "key four flats", a.k.a Ab major.  
 "[k4f a a e e f f e]" @=> string pitches_Ab;
+// melody.setPitch(pitches_Ab);
+// melody.printContents();
 
 // Octaves
 // -----------------------
 // octaves can be explicitly set by simply adding the octave number 
 // after the pitch name:
 
-"[c5 c g g a a g]" @=> pitches;
+"[c5 c g5 g a a g]" @=> pitches;
+// melody.setPitch(pitches);
+// melody.printContents();
 
 // Direction flags
 // -----------------------
@@ -93,6 +99,8 @@ melody.printRhythms();
 // the previous note. Multiple octave jumps can be used with 'uu', 'ddd' etc.
 
 "[c3 cu g g auu a gd]" @=> string jump_octaves;
+// melody.setPitch(jump_octaves);
+// melody.printContents();
 
 // Proximity
 // -----------------------
@@ -105,7 +113,8 @@ melody.printRhythms();
 "[g4 a b c d e fs]" @=> string gMajor;
 // represents an ascending scale and doesn't jump down when crossing the 
 // octave boundary between B and C.
-
+// melody.setPitch(gMajor);
+// melody.printContents();
 
 ///////////////////////////////////////////////////////////////////////
 // More on Rhythm entry
@@ -113,8 +122,22 @@ melody.printRhythms();
 // Use the '.' character after the rhythm to indicate dotted rhythms of any resolution:
 "[q. q. q.. q.. e. e. s..]" @=> string dotted;
 
+// melody.setPitch(pitches);
+// melody.setRhythm(dotted);
+// melody.printContents();
+
+
 // Use the character 't' before the rhythm to indicate triplets
 "[te te te tq tq tq th]" @=> string triplets;
+
+// melody.setRhythm(triplets);
+// melody.printContents();
+
+// Dotted triplets are possible
+"[te. te. te. tq. tq. tq. th..]" @=> string dottedTriplets;
+
+// melody.setRhythm(dottedTriplets);
+// melody.printContents();
 
 ///////////////////////////////////////////////////////////////////////
 // Repeat shortcut
@@ -125,6 +148,10 @@ melody.printRhythms();
 "[cx2 dx4 ex8]" @=> string pitch_repeat;
 "[qx2 e.x4 tsx8]" @=> string rhythm_repeat;
 
+// melody.setPitch(pitch_repeat);
+// melody.setRhythm(rhythm_repeat);
+// melody.printContents();
+
 ///////////////////////////////////////////////////////////////////////
 // Chord entry
 
@@ -132,6 +159,10 @@ melody.printRhythms();
 // the ':' character. Normal pitch entry/format rules apply
 
 "[c3:e:g c:f:a d:f:g:b c:e:g:cu]" @=> string chords;
+
+// melody.setPitch(chords);
+// melody.setRhythm("[qx4]");
+// melody.printContents();
 
 // NOTE: EZscore pitch arrays are 2D, indexed first by position in the 
 // sequence, then in ascending order in the chord. A monophonic melody
@@ -150,3 +181,6 @@ melody.printRhythms();
 "[c4 c g g a a _a g]" @=> string pitchesTied;
 "[q q q q q q _e q]" @=> string rhythmTied;
 
+// melody.setPitch(pitchesTied);
+// melody.setRhythm(rhythmTied);
+// melody.printContents();
