@@ -9,8 +9,25 @@
 // -------------------------------------------------------------------------------
 // Writing long sequences in EZscore notation
 // -------------------------------------------------------------------------------
-"[k2s f4:a:du r e:g d:fs c:e d:fs f:a e:g d:fs e:g d:f:a r a b csd d d:f:au d:fs f:a e:g d:fs e:g f:a e:g fs d r]" => string mozart_p;
-"[q q sx8 q q e e e e q q sx4 e e e q. h]" => string mozart_r;
+
+// Tuba
+"[k5s r r r r r r r r]" @=> string tuba_1_8;
+"[h.x7 h.]" @=> string tuba_1_8_R;
+"[k5s r e3 d e//r e e//r e d e//r e e//r d dn d//r d d//r g gn g//r g g]" @=> string tuba_9_16;
+"[q e e q//qx3//q e e q//qx3//q e e q//qx3//q e e q//q q q]" @=> string tuba_9_16_R;
+"[k5s r e3 d e//r e e//r e d e//r e e//r d dn d//r d d//r d d//r d d]" @=> string tuba_17_24;
+"[q e e q//qx3//q e e q//qx3//q e e q//qx3//qx3//q q q]" @=> string tuba_17_24_R;
+"[k5s r d3 dn d//r d d//r g gn g b//r e3 e//r c c//r es es//r//r]" @=> string tuba_25_32;
+"[q e e q//qx3//q ex4//qx3//qx3//qx3//h.//h.]" @=> string tuba_25_32_R;
+"[k5s r d3 dn d//r d d//r g g//r e e//r r r r]" @=> string tuba_33_40;
+"[q e e q//qx3//qx3//qx3//h. h. h. h.]" @=> string tuba_33_40_R;
+"[k5s e2 g3:b g:b//e2 a3:g4 a3n:gn4 a3:g4 d4:c5//d2 f3:a f:a//d2 f3:an es:g f:an b:e//c2 e3:g e:g//c2 f3:e4 es3:d4 f3:e4 d4:a4//b1 d3:f d:f//cn2 d3:f dn:es d:f an3:d4]" @=> string tuba_41_48;
+"[qx3//q ex4//qx3//q ex4//qx3//q ex4//qx3//q e e e e]" @=> string tuba_41_48_R;
+"[k5s e2 g3:b g:b//e2 a3:g4 a3n:gn4 a3:g4 d4:c5//d2 f3:a f:a//d2 f3:an es:g f:an an:cn//c2 e3:g e:g//c2 e3:gn d:f e:gn gn:cn//cn2 e3:gn e:gn//cn2 e3 e]" @=> string tuba_49_56;
+"[qx3//q ex4//qx3//q ex4//qx3//q ex4//qx3//q q q]" @=> string tuba_49_56_R;
+
+[tuba_1_8, tuba_9_16, tuba_17_24, tuba_25_32, tuba_33_40, tuba_41_48, tuba_49_56] @=> string tuba_pitch[];
+[tuba_1_8_R, tuba_9_16_R, tuba_17_24_R, tuba_25_32_R, tuba_33_40_R, tuba_41_48_R, tuba_49_56_R] @=> string tuba_rhythm[];
 
 // Cello
 "[k5s b2 fu es f//fd fu f//bd fu f//fd fu f//b2 fu es f//fd fu f//bd fu f//fd fu es f]" @=> string cello_1_8;
@@ -107,76 +124,31 @@
 [flute_1_8, flute_9_16, flute_17_24, flute_25_32, flute_33_40, flute_41_48, flute_49_56] @=> string flute_pitch[];
 [flute_1_8_R, flute_9_16_R, flute_17_24_R, flute_25_32_R, flute_33_40_R, flute_41_48_R, flute_49_56_R] @=> string flute_rhythm[];
 
-// Tuba
-"[k5s r r r r r r r r]" @=> string tuba_1_8;
-"[h.x7 h.]" @=> string tuba_1_8_R;
-"[k5s r e3 d e//r e e//r e d e//r e e//r d dn d//r d d//r g gn g//r g g]" @=> string tuba_9_16;
-"[q e e q//qx3//q e e q//qx3//q e e q//qx3//q e e q//q q q]" @=> string tuba_9_16_R;
-"[k5s r e3 d e//r e e//r e d e//r e e//r d dn d//r d d//r d d//r d d]" @=> string tuba_17_24;
-"[q e e q//qx3//q e e q//qx3//q e e q//qx3//qx3//q q q]" @=> string tuba_17_24_R;
-"[k5s r d3 dn d//r d d//r g gn g b//r e3 e//r c c//r es es//r//r]" @=> string tuba_25_32;
-"[q e e q//qx3//q ex4//qx3//qx3//qx3//h.//h.]" @=> string tuba_25_32_R;
-"[k5s r d3 dn d//r d d//r g g//r e e//r r r r]" @=> string tuba_33_40;
-"[q e e q//qx3//qx3//qx3//h. h. h. h.]" @=> string tuba_33_40_R;
-"[k5s e2 g3:b g:b//e2 a3:g4 a3n:gn4 a3:g4 d4:c5//d2 f3:a f:a//d2 f3:an es:g f:an b:e//c2 e3:g e:g//c2 f3:e4 es3:d4 f3:e4 d4:a4//b1 d3:f d:f//cn2 d3:f dn:es d:f an3:d4]" @=> string tuba_41_48;
-"[qx3//q ex4//qx3//q ex4//qx3//q ex4//qx3//q e e e e]" @=> string tuba_41_48_R;
-"[k5s e2 g3:b g:b//e2 a3:g4 a3n:gn4 a3:g4 d4:c5//d2 f3:a f:a//d2 f3:an es:g f:an an:cn//c2 e3:g e:g//c2 e3:gn d:f e:gn gn:cn//cn2 e3:gn e:gn//cn2 e3 e]" @=> string tuba_49_56;
-"[qx3//q ex4//qx3//q ex4//qx3//q ex4//qx3//q q q]" @=> string tuba_49_56_R;
 
-[tuba_1_8, tuba_9_16, tuba_17_24, tuba_25_32, tuba_33_40, tuba_41_48, tuba_49_56] @=> string tuba_pitch[];
-[tuba_1_8_R, tuba_9_16_R, tuba_17_24_R, tuba_25_32_R, tuba_33_40_R, tuba_41_48_R, tuba_49_56_R] @=> string tuba_rhythm[];
+EZscore tuba(tuba_pitch, tuba_rhythm);
+EZscore cello(cello_pitch, cello_rhythm);
+EZscore viola(viola_pitch, viola_rhythm);
+EZscore violinII(violinII_pitch, violinII_rhythm);
+EZscore violinI(violinI_pitch, violinI_rhythm);
+EZscore flute(flute_pitch, flute_rhythm);
 
-
-EZscore tuba;
-tuba.setPitch(tuba_pitch);
-tuba.setRhythm(tuba_rhythm);
-
-EZscore cello;
-cello.setPitch(cello_pitch);
-cello.setRhythm(cello_rhythm);
-
-EZscore viola;
-viola.setPitch(viola_pitch);
-viola.setRhythm(viola_rhythm);
-
-EZscore violinII;
-violinII.setPitch(violinII_pitch);
-violinII.setRhythm(violinII_rhythm);
-
-EZscore violinI;
-violinI.setPitch(violinI_pitch);
-violinI.setRhythm(violinI_rhythm);
-
-EZscore flute;
-flute.setPitch(flute_pitch);
-flute.setRhythm(flute_rhythm);
-
-EZscore fullScore[];
-
-[tuba, cello, viola, violinII, violinI, flute] @=> fullScore;
-
-0 => int total_voices;
-for(int i; i < fullScore.size(); i++)
-{
-    fullScore[i].n_voices +=> total_voices;
-}
+[tuba, cello, viola, violinII, violinI, flute] @=> EZscore fullScore[];
+[.1, .075, .05, .05, .15, .075] @=> float levels[];
 
 //---------------------------------------------------------------------
 // Playback
 //---------------------------------------------------------------------
 
+// Setup ScorePlayer
 160 => float bpm;
 
 ScorePlayer player[fullScore.size()];
-
 for(int i; i < fullScore.size(); i++)
 {
-    ScorePlayer sp;
-    sp.init(fullScore[i]);
-    sp @=> player[i];
+    ScorePlayer sp(fullScore[i], bpm, levels[i]) @=> player[i];
 }
 
-
+// Play through once
 for(int i; i < player.size(); i++)
 {
     spork ~ player[i].play();
